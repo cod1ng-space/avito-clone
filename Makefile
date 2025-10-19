@@ -35,8 +35,8 @@ DB_NAME=db-omega
 DB_USER=postgres
 BACKEND_PORT=8080
 FRONTEND_PORT=3000
-MIGRATE_PATH=backend/migrations
-DATABASE_URL=postgres://$(DB_USER):postgre@localhost:5432/$(DB_NAME)?sslmode=disable
+MIGRATE_PATH=migrations
+DATABASE_URL=postgres://$(DB_USER):postgres@localhost:5432/$(DB_NAME)?sslmode=disable
 
 # Установка зависимостей
 install:
@@ -64,20 +64,28 @@ build:
 start: build
 	@echo "🚀 Запуск проекта..."
 	@pkill -f "bin/server" 2>/dev/null || true
-	@pkill -f "serve -s build" 2>/dev/null || true
-	cd backend && ./bin/server &
+	@pkill -f "serve.*build" 2>/dev/null || true
+	@echo "Установка serve если нужно..."
+	@command -v serve >/dev/null 2>&1 || npm install -g serve
+	@echo "Запуск бэкенда..."
+	@cd backend && nohup ./bin/server > ../backend.log 2>&1 &
 	@echo "⏳ Ожидание запуска бэкенда..."
 	@sleep 3
-	cd frontend && npx serve -s build -l $(FRONTEND_PORT) &
+	@echo "Запуск фронтенда..."
+	@cd frontend && nohup serve -s build -l $(FRONTEND_PORT) > ../frontend.log 2>&1 &
+	@sleep 2
 	@echo "✅ Проект запущен:"
 	@echo "   - Бэкенд: http://localhost:$(BACKEND_PORT)"
 	@echo "   - Фронтенд: http://localhost:$(FRONTEND_PORT)"
+	@echo "Логи:"
+	@echo "   - Бэкенд: backend.log"
+	@echo "   - Фронтенд: frontend.log"
 
 # Запуск в режиме разработки
 dev:
 	@echo "🛠️ Запуск в режиме разработки..."
 	@echo "Запуск бэкенда в фоне..."
-	@cd backend && nohup go run ./cmd/server/main.go > ../backend.log 2>&1 &
+	@cd backend && go run ./cmd/server/main.go > ../backend.log 2>&1 &
 	@sleep 3
 	@echo "Запуск фронтенда..."
 	@cd frontend && npm start
@@ -88,13 +96,11 @@ dev:
 # Запуск только бэкенда
 dev-backend:
 	@echo "🛠️ Запуск бэкенда..."
-	@pkill -f "go run.*main.go" 2>/dev/null || true
-	@cd backend && go run ./cmd/server/main.go
+	@cd backend && go run ./cmd/server
 
 # Запуск только фронтенда
 dev-frontend:
 	@echo "🛠️ Запуск фронтенда..."
-	@pkill -f "react-scripts start" 2>/dev/null || true
 	@cd frontend && npm start
 
 # Остановка всех процессов
@@ -156,7 +162,7 @@ full-setup: check-deps install create-uploads setup-db
 # Docker команды
 docker-up:
 	@echo "🐳 Запуск проекта в Docker..."
-	docker-compose up -d
+	docker compose up -d
 	@echo "✅ Проект запущен в Docker:"
 	@echo "   - Фронтенд: http://localhost:3000"
 	@echo "   - Бэкенд: http://localhost:8080"
@@ -164,48 +170,48 @@ docker-up:
 
 docker-down:
 	@echo "🐳 Остановка Docker контейнеров..."
-	docker-compose down
+	docker compose down
 	@echo "✅ Docker контейнеры остановлены"
 
 docker-build:
 	@echo "🐳 Пересборка Docker образов..."
-	docker-compose build --no-cache
+	docker compose build --no-cache
 	@echo "✅ Docker образы пересобраны"
 
 docker-logs:
 	@echo "📋 Логи Docker контейнеров:"
-	docker-compose logs -f
+	docker compose logs -f
 
 # Команды для миграций с go-migrate CLI
 migrate-up:
 	@echo "🔄 Применение всех миграций..."
-	@cd backend && migrate -path migrations -database "$(DATABASE_URL)" up
+	@cd backend && migrate -path "$(MIGRATE_PATH)" -database "$(DATABASE_URL)" up
 	@echo "✅ Миграции применены"
 
 migrate-down:
 	@echo "↩️ Откат последней миграции..."
-	@cd backend && migrate -path migrations -database "$(DATABASE_URL)" down 1
+	@cd backend && migrate -path "$(MIGRATE_PATH)" -database "$(DATABASE_URL)" down 1
 	@echo "✅ Миграция откачена"
 
 migrate-drop:
 	@echo "🗑️ Удаление всех таблиц..."
-	@cd backend && migrate -path migrations -database "$(DATABASE_URL)" drop -f
+	@cd backend && migrate -path "$(MIGRATE_PATH)" -database "$(DATABASE_URL)" drop -f
 	@echo "✅ Все таблицы удалены"
 
 migrate-version:
 	@echo "📊 Текущая версия миграции:"
-	@cd backend && migrate -path migrations -database "$(DATABASE_URL)" version
+	@cd backend && migrate -path "$(MIGRATE_PATH)" -database "$(DATABASE_URL)" version
 
 migrate-force:
 	@echo "🔧 Принудительное исправление версии миграции..."
 	@read -p "Введите версию для исправления: " version; \
-	cd backend && migrate -path migrations -database "$(DATABASE_URL)" force $$version
+	cd backend && migrate -path "$(MIGRATE_PATH)" -database "$(DATABASE_URL)" force $$version
 	@echo "✅ Версия миграции исправлена"
 
 migrate-new:
 	@echo "📝 Создание новой миграции..."
 	@read -p "Введите название миграции: " name; \
-	cd backend && migrate create -ext sql -dir migrations -seq $$name
+	cd backend && migrate create -ext sql -dir "$(MIGRATE_PATH)" -seq $$name
 	@echo "✅ Новая миграция создана"
 
 # Создание базы данных и применение миграций

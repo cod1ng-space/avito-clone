@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, ButtonGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const AdCard = ({ ad }) => {
+const AdCard = ({ ad, showActions = false, onDelete }) => {
   return (
     <Card className="h-100">
       {ad.images && ad.images.length > 0 && (
@@ -23,13 +23,30 @@ const AdCard = ({ ad }) => {
         </Card.Text>
         
         <div className="mt-auto">
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center mb-2">
             <small className="text-muted">
-              {ad.subcategory?.name} • {ad.user?.username}
+              {ad.subcategory?.name} {ad.user?.username && `• ${ad.user.username}`}
             </small>
+          </div>
+          
+          <div className="d-flex justify-content-between align-items-center">
             <Link to={`/ads/${ad.id}`}>
-              <Button variant="primary" size="sm">Просмотр</Button>
+              <Button variant="outline-primary" size="sm">Просмотр</Button>
             </Link>
+            
+            {showActions && (
+              <ButtonGroup size="sm">
+                <Link to={`/edit-ad/${ad.id}`}>
+                  <Button variant="warning">Редактировать</Button>
+                </Link>
+                <Button 
+                  variant="danger" 
+                  onClick={onDelete}
+                >
+                  Удалить
+                </Button>
+              </ButtonGroup>
+            )}
           </div>
         </div>
       </Card.Body>
