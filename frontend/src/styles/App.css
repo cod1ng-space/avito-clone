@@ -1,0 +1,15 @@
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.img-thumbnail {
+  transition: transform 0.2s;
+}
+
+.img-thumbnail:hover {
+  transform: scale(1.05);
+}
