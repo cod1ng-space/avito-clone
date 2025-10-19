@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # PostgreSQL база данных
+  postgres:
+    image: postgres:15-alpine
+    container_name: adboard-postgres
+    environment:
+      POSTGRES_DB: db-omega
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgre
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backend/sql/categories.sql:/docker-entrypoint-initdb.d/02-categories.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend сервис
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: adboard-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      DB_NAME: db-omega
+      JWT_SECRET: super_secret_jwt_key
+      UPLOAD_DIR: /app/uploads/images
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Frontend сервис (для продакшена)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: adboard-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
