@@ -15,32 +15,32 @@ const CategoryAds = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
+    const loadCategory = async () => {
+      try {
+        const categories = await categoriesService.getAll();
+        const foundCategory = categories.find(cat => cat.id === parseInt(id));
+        setCategory(foundCategory);
+      } catch (error) {
+        console.error('Failed to load category:', error);
+      }
+    };
+
+    const loadAds = async () => {
+      try {
+        setLoading(true);
+        const data = await adsService.search('', id, currentPage);
+        setAds(data.ads);
+        setTotalPages(Math.ceil(data.total / data.limit));
+      } catch (error) {
+        console.error('Error loading ads:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadCategory();
     loadAds();
   }, [id, currentPage]);
-
-  const loadCategory = async () => {
-    try {
-      const categories = await categoriesService.getAll();
-      const foundCategory = categories.find(cat => cat.id === parseInt(id));
-      setCategory(foundCategory);
-    } catch (error) {
-      console.error('Failed to load category:', error);
-    }
-  };
-
-  const loadAds = async () => {
-    try {
-      setLoading(true);
-      const data = await adsService.search('', id, currentPage);
-      setAds(data.ads);
-      setTotalPages(Math.ceil(data.total / data.limit));
-    } catch (error) {
-      console.error('Error loading ads:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) return <Container className="text-center">Загрузка...</Container>;
 

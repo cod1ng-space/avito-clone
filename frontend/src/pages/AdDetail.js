@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { adsService } from '../services/ads';
 import ImageGallery from '../components/ui/ImageGallery';
@@ -11,21 +11,21 @@ const AdDetail = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const loadAd = async () => {
+      try {
+        setLoading(true);
+        const data = await adsService.getById(id);
+        setAd(data);
+      } catch (error) {
+        setError('Ошибка загрузки объявления');
+        console.error('Ошибка загрузки объявления:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadAd();
   }, [id]);
-
-  const loadAd = async () => {
-    try {
-      setLoading(true);
-      const data = await adsService.getById(id);
-      setAd(data);
-    } catch (error) {
-      setError('Ошибка загрузки объявления');
-      console.error('Ошибка загрузки объявления:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) return <Container className="text-center">Загрузка...</Container>;
   if (error) return <Container><Alert variant="danger">{error}</Alert></Container>;

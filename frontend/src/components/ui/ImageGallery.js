@@ -19,7 +19,7 @@ const ImageGallery = ({ images }) => {
           <img
             key={image.id}
             src={`/images/${image.file_path}`}
-            alt={`Ad image ${index + 1}`}
+            alt={`${index + 1}`}
             style={{ 
               width: '100px', 
               height: '100px', 
@@ -43,7 +43,7 @@ const ImageGallery = ({ images }) => {
                 <img
                   className="d-block w-100"
                   src={`/images/${image.file_path}`}
-                  alt={`Ad image ${index + 1}`}
+                  alt={`${index + 1}`}
                   style={{ maxHeight: '70vh', objectFit: 'contain' }}
                 />
               </Carousel.Item>

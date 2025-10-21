@@ -17,38 +17,38 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await categoriesService.getAll();
+        setCategories(data);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+
+    const loadAds = async () => {
+        try {
+            setLoading(true);
+            const data = await adsService.search(
+                searchQuery, 
+                selectedCategory, 
+                currentPage
+            );
+            
+            setAds(data.ads);
+            setTotalPages(Math.ceil(data.total / data.limit));
+        } catch (error) {
+            console.error('Ошибка загрузки объявлений:', error);
+            setAds([]);
+            setTotalPages(1);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     loadCategories();
     loadAds();
   }, [currentPage, searchQuery, selectedCategory]);
-
-  const loadCategories = async () => {
-    try {
-      const data = await categoriesService.getAll();
-      setCategories(data);
-    } catch (error) {
-      console.error('Failed to load categories:', error);
-    }
-  };
-
-  const loadAds = async () => {
-      try {
-          setLoading(true);
-          const data = await adsService.search(
-              searchQuery, 
-              selectedCategory, 
-              currentPage
-          );
-          
-          setAds(data.ads);
-          setTotalPages(Math.ceil(data.total / data.limit));
-      } catch (error) {
-          console.error('Ошибка загрузки объявлений:', error);
-          setAds([]);
-          setTotalPages(1);
-      } finally {
-          setLoading(false);
-      }
-  };
 
   const handleSearch = (query) => {
     setSearchQuery(query);

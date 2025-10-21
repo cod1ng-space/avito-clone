@@ -14,28 +14,28 @@ const EditAd = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const loadAd = async () => {
+      try {
+        const data = await adsService.getById(id);
+        setAd(data);
+      } catch (error) {
+        setError('Ошибка загрузки объявления');
+        console.error('Ошибка загрузки объявления:', error);
+      }
+    };
+
+    const loadCategories = async () => {
+      try {
+        const data = await categoriesService.getAll();
+        setCategories(data);
+      } catch (error) {
+        console.error('Ошибка загрузки категорий:', error);
+      }
+    };
+
     loadAd();
     loadCategories();
   }, [id]);
-
-  const loadAd = async () => {
-    try {
-      const data = await adsService.getById(id);
-      setAd(data);
-    } catch (error) {
-      setError('Ошибка загрузки объявления');
-      console.error('Ошибка загрузки объявления:', error);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const data = await categoriesService.getAll();
-      setCategories(data);
-    } catch (error) {
-      console.error('Ошибка загрузки категорий:', error);
-    }
-  };
 
   const handleSubmit = async (adData) => {
     try {

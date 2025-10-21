@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Alert, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { adsService } from '../services/ads';
@@ -12,11 +12,7 @@ const MyAds = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    loadAds();
-  }, [currentPage]);
-
-  const loadAds = async () => {
+  const loadAds = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adsService.getUserAds(currentPage);
@@ -28,7 +24,11 @@ const MyAds = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
+
+  useEffect(() => {
+    loadAds();
+  }, [loadAds]);
 
   const handleDelete = async (id) => {
     if (window.confirm('Вы уверены, что хотите удалить это объявление?')) {
