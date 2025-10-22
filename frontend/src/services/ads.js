@@ -11,14 +11,14 @@ export const adsService = {
     return response.data;
   },
 
-  getUserAds: async (page = 1, limit = 10) => {
+  getUserAds: async (page = 1, limit = 12) => {
     const response = await api.get('/my-ads', { 
       params: { page, limit } 
     });
     return response.data;
   },
 
-  search: async (query, categoryId, page = 1, limit = 10) => {
+  search: async (query, categoryId, page = 1, limit = 12) => {
       const params = {
           q: query || '',
           page,

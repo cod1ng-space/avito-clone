@@ -6,9 +6,14 @@ export const authService = {
     return response.data;
   },
 
-  register: async (email, password) => {
+  register: async (email, password, username, phone) => {
     try {
-      const response = await api.post('/register', { email, password });
+      const response = await api.post('/register', { 
+        email, 
+        password, 
+        username, 
+        phone 
+      });
       return response.data;
     } catch (error) {
       if (error.response?.data?.message) {

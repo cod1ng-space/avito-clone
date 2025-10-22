@@ -10,7 +10,8 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} className="mb-0">
+      <Form.Label>Поиск</Form.Label>
       <InputGroup>
         <Form.Control
           type="text"

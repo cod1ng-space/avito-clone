@@ -55,6 +55,13 @@ type AuthRequest struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
+type RegisterRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+	Username string `json:"username" validate:"required,min=3,max=100"`
+	Phone    string `json:"phone" validate:"required,phone"`
+}
+
 type AdCreateRequest struct {
 	Title         string `json:"title" validate:"required,min=3,max=200"`
 	Description   string `json:"description" validate:"required,min=5"`
@@ -69,7 +76,7 @@ type AdUpdateRequest struct {
 
 type UserUpdateRequest struct {
 	Username      string  `json:"username" validate:"omitempty,min=3,max=100"`
-	Phone         string  `json:"phone" validate:"omitempty"`
+	Phone         string  `json:"phone" validate:"omitempty,phone"`
 	SocialNetwork *string `json:"social_network" validate:"omitempty"`
 	SocialContact *string `json:"social_contact" validate:"omitempty"`
 }

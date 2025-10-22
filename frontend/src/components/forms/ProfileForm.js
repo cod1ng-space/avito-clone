@@ -10,6 +10,7 @@ const ProfileForm = ({ onSuccess }) => {
   const [socialNetwork, setSocialNetwork] = useState('');
   const [socialContact, setSocialContact] = useState('');
   const [error, setError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,8 +22,30 @@ const ProfileForm = ({ onSuccess }) => {
     }
   }, [currentUser]);
 
+  // Валидация номера телефона
+  const validatePhone = (phoneNumber) => {
+    const phoneRegex = /^(\+7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    return phoneRegex.test(phoneNumber);
+  };
+
+  const handlePhoneChange = (e) => {
+    const phoneValue = e.target.value;
+    setPhone(phoneValue);
+    
+    if (phoneValue && !validatePhone(phoneValue)) {
+      setPhoneError('Неверный формат номера телефона (пример: +7 (900) 123-45-67)');
+    } else {
+      setPhoneError('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (phone && !validatePhone(phone)) {
+      setError('Введите корректный номер телефона');
+      return;
+    }
     
     try {
       setError('');
@@ -62,9 +85,17 @@ const ProfileForm = ({ onSuccess }) => {
         <Form.Control
           type="tel"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          onChange={handlePhoneChange}
+          placeholder="+7 (900) 123-45-67"
           required
+          isInvalid={!!phoneError}
         />
+        <Form.Control.Feedback type="invalid">
+          {phoneError}
+        </Form.Control.Feedback>
+        <Form.Text className="text-muted">
+          Формат: +7 (900) 123-45-67 или 8 900 123 45 67
+        </Form.Text>
       </Form.Group>
       
       <Form.Group className="mb-3" controlId="socialNetwork">
@@ -93,7 +124,7 @@ const ProfileForm = ({ onSuccess }) => {
         />
       </Form.Group>
       
-      <Button disabled={loading} type="submit">
+      <Button disabled={loading || !!phoneError} type="submit">
         Обновить профиль
       </Button>
     </Form>

@@ -3,8 +3,8 @@ import { Form } from 'react-bootstrap';
 
 const CategorySelector = ({ categories, selectedCategory, onCategoryChange }) => {
   return (
-    <Form.Group>
-      <Form.Label>Фильтр по категории</Form.Label>
+    <Form.Group className="mb-0">
+      <Form.Label>Категория</Form.Label>
       <Form.Select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}

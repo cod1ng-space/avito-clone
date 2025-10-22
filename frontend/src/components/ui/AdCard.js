@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button, ButtonGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const AdCard = ({ ad, showActions = false, onDelete }) => {
   return (
@@ -8,7 +9,7 @@ const AdCard = ({ ad, showActions = false, onDelete }) => {
       {ad.images && ad.images.length > 0 && (
         <Card.Img 
           variant="top" 
-          src={`/images/${ad.images[0].file_path}`}
+          src={getImageUrl(ad.images[0].file_path)}
           style={{ height: '200px', objectFit: 'cover' }}
         />
       )}

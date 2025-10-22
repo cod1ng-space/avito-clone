@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, Container, NavDropdown, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -24,6 +24,16 @@ const Header = () => {
               <Nav.Link>Главная</Nav.Link>
             </LinkContainer>
           </Nav>
+          
+          {currentUser && (
+            <Nav className="me-3">
+              <LinkContainer to="/create-ad">
+                <Button variant="success" size="sm" className="me-2">
+                  + Создать объявление
+                </Button>
+              </LinkContainer>
+            </Nav>
+          )}
           
           <Nav>
             {currentUser ? (

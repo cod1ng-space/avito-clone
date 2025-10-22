@@ -58,9 +58,6 @@ const MyAds = () => {
       {ads.length === 0 ? (
         <div className="text-center">
           <h4>У вас пока нет объявлений</h4>
-          <Link to="/create-ad">
-            <Button variant="primary" className="mt-3">Создать первое объявление</Button>
-          </Link>
         </div>
       ) : (
         <>

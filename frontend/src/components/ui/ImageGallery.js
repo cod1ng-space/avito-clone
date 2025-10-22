@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Carousel } from 'react-bootstrap';
+import { getImageUrl } from '../../utils/imageUrl';
 
 const ImageGallery = ({ images }) => {
   const [showModal, setShowModal] = useState(false);
@@ -18,7 +19,7 @@ const ImageGallery = ({ images }) => {
         {images.map((image, index) => (
           <img
             key={image.id}
-            src={`/images/${image.file_path}`}
+            src={getImageUrl(image.file_path)}
             alt={`${index + 1}`}
             style={{ 
               width: '100px', 
@@ -42,7 +43,7 @@ const ImageGallery = ({ images }) => {
               <Carousel.Item key={image.id}>
                 <img
                   className="d-block w-100"
-                  src={`/images/${image.file_path}`}
+                  src={getImageUrl(image.file_path)}
                   alt={`${index + 1}`}
                   style={{ maxHeight: '70vh', objectFit: 'contain' }}
                 />

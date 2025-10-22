@@ -79,7 +79,7 @@ func (h *ItemHandler) GetUserAds(c echo.Context) error {
 
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
 
 	ads, total, err := h.service.GetUserAds(userID, page, limit)
@@ -105,7 +105,7 @@ func (h *ItemHandler) SearchAds(c echo.Context) error {
 		page = 1
 	}
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
 
 	var categoryID uint

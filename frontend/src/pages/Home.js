@@ -62,11 +62,11 @@ const Home = () => {
 
   return (
     <Container>
-      <Row className="mb-4">
-        <Col md={8}>
+      <Row className="mb-4 align-items-end">
+        <Col md={6}>
           <SearchBar onSearch={handleSearch} />
         </Col>
-        <Col md={4}>
+        <Col md={6}>
           <CategorySelector 
             categories={categories}
             selectedCategory={selectedCategory}
@@ -89,7 +89,7 @@ const Home = () => {
 
           {ads.length === 0 && (
             <div className="text-center">
-              <h4>No ads found</h4>
+              <h4>В этой категории не найдено объявлений</h4>
             </div>
           )}
 

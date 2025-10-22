@@ -54,9 +54,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (email, password, username, phone) => {
     try {
-      await authService.register(email, password);
+      await authService.register(email, password, username, phone);
       // После успешной регистрации автоматически выполняем вход
       return await login(email, password);
     } catch (error) {

@@ -22,7 +22,10 @@ WORKDIR /app
 # Copy the binary from builder stage
 COPY --from=builder /app/main .
 
-# Create uploads directory
+# Copy any existing uploads directory
+COPY --from=builder /app/uploads ./uploads
+
+# Create uploads directory if it doesn't exist
 RUN mkdir -p uploads/images
 
 # Expose port

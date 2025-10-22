@@ -14,7 +14,6 @@ import (
 
 const (
 	maxUploadSize = 10 << 20 // 10MB
-	uploadDir     = "./uploads/images"
 )
 
 var allowedMimeTypes = map[string]bool{
@@ -27,6 +26,12 @@ var allowedMimeTypes = map[string]bool{
 
 func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// Get upload directory from environment or use default
+		uploadDir := os.Getenv("UPLOAD_DIR")
+		if uploadDir == "" {
+			uploadDir = "./uploads/images"
+		}
+
 		// Create upload directory if it doesn't exist
 		if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create upload directory")

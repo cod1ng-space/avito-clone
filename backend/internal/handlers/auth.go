@@ -20,7 +20,7 @@ func NewAuthHandler(service *service.Service) *AuthHandler {
 }
 
 func (h *AuthHandler) Register(c echo.Context) error {
-	var req models.AuthRequest
+	var req models.RegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request payload")
 	}
@@ -37,6 +37,8 @@ func (h *AuthHandler) Register(c echo.Context) error {
 				errorMessage += fmt.Sprintf("%s must be a valid email; ", e.Field())
 			case "min":
 				errorMessage += fmt.Sprintf("%s must be at least %s characters; ", e.Field(), e.Param())
+			case "phone":
+				errorMessage += fmt.Sprintf("%s must be a valid phone number; ", e.Field())
 			}
 		}
 		return echo.NewHTTPError(http.StatusBadRequest, errorMessage)
@@ -45,7 +47,8 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	user := &models.User{
 		Email:        req.Email,
 		PasswordHash: req.Password,
-		Username:     req.Email, // Default to email, can be changed later
+		Username:     req.Username,
+		Phone:        req.Phone,
 	}
 
 	if err := h.service.RegisterUser(user); err != nil {

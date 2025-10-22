@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Alert } from 'react-bootstrap';
 import { adsService } from '../services/ads';
+import { useAuth } from '../contexts/AuthContext';
 import ImageGallery from '../components/ui/ImageGallery';
 
 const AdDetail = () => {
   const { id } = useParams();
+  const { currentUser } = useAuth();
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showPhone, setShowPhone] = useState(false);
 
   useEffect(() => {
     const loadAd = async () => {
@@ -59,19 +62,45 @@ const AdDetail = () => {
             <Card.Header>Контактная информация</Card.Header>
             <Card.Body>
               <p><strong>Имя пользователя:</strong> {ad.user?.username}</p>
-              <p><strong>Телефон:</strong> {ad.user?.phone}</p>
               
-              {ad.user?.social_network && ad.user?.social_contact && (
-                <p>
-                  <strong>{ad.user.social_network}:</strong> {ad.user.social_contact}
-                </p>
+              {currentUser ? (
+                <>
+                  <p>
+                    <strong>Телефон:</strong>{' '}
+                    {showPhone ? (
+                      ad.user?.phone
+                    ) : (
+                      <Button 
+                        variant="link" 
+                        className="p-0 text-decoration-none"
+                        onClick={() => setShowPhone(true)}
+                      >
+                        Показать номер
+                      </Button>
+                    )}
+                  </p>
+                  
+                  {ad.user?.social_network && ad.user?.social_contact && (
+                    <p>
+                      <strong>{ad.user.social_network}:</strong> {ad.user.social_contact}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className="text-center">
+                  <Alert variant="info" className="mb-3">
+                    Для просмотра контактной информации необходимо авторизоваться
+                  </Alert>
+                  <div className="d-grid gap-2">
+                    <Button as={Link} to="/login" variant="primary">
+                      Войти
+                    </Button>
+                    <Button as={Link} to="/register" variant="outline-primary">
+                      Регистрация
+                    </Button>
+                  </div>
+                </div>
               )}
-              
-              <div className="d-grid gap-2">
-                <Button variant="outline-primary">
-                  Показать номер телефона
-                </Button>
-              </div>
             </Card.Body>
           </Card>
         </Col>
