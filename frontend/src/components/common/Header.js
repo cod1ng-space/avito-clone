@@ -29,7 +29,7 @@ const Header = () => {
             <Nav className="me-3">
               <LinkContainer to="/create-ad">
                 <Button variant="success" size="sm" className="me-2">
-                  + Создать объявление
+                  Создать объявление
                 </Button>
               </LinkContainer>
             </Nav>

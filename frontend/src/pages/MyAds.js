@@ -47,7 +47,7 @@ const MyAds = () => {
   return (
     <Container>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Мои объявления</h1>
+        <h1 style={{margin: 0}}>Мои объявления</h1>
         <Link to="/create-ad">
           <Button variant="primary">Создать новое объявление</Button>
         </Link>

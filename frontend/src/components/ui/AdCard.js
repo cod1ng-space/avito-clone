@@ -31,22 +31,25 @@ const AdCard = ({ ad, showActions = false, onDelete }) => {
           </div>
           
           <div className="d-flex justify-content-between align-items-center">
-            <Link to={`/ads/${ad.id}`}>
-              <Button variant="outline-primary" size="sm">Просмотр</Button>
-            </Link>
-            
+            <div>
+              <Link to={`/ads/${ad.id}`}>
+                <Button variant="outline-primary" size="sm">Просмотр</Button>
+              </Link>
+            </div>
+
             {showActions && (
-              <ButtonGroup size="sm">
-                <Link to={`/edit-ad/${ad.id}`}>
-                  <Button variant="warning">Редактировать</Button>
+              <div>
+                <Link to={`/edit-ad/${ad.id}`} className="me-2">
+                  <Button variant="outline-warning" size="sm">Редактировать</Button>
                 </Link>
                 <Button 
-                  variant="danger" 
+                  variant="outline-danger" 
+                  size="sm"
                   onClick={onDelete}
                 >
                   Удалить
                 </Button>
-              </ButtonGroup>
+              </div>
             )}
           </div>
         </div>

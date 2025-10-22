@@ -12,7 +12,8 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
     if (initialData) {
       setTitle(initialData.title);
       setDescription(initialData.description);
-      setSubcategoryId(initialData.subcategory_id);
+      // Ensure we store subcategory id as a string so it matches option values
+      setSubcategoryId(initialData.subcategory_id ? String(initialData.subcategory_id) : '');
     }
   }, [initialData]);
 
@@ -88,7 +89,7 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
           {categories.map(category => (
             <optgroup key={category.id} label={category.name}>
               {category.subcategories?.map(subcategory => (
-                <option key={subcategory.id} value={subcategory.id}>
+                <option key={subcategory.id} value={String(subcategory.id)}>
                   {subcategory.name}
                 </option>
               ))}
