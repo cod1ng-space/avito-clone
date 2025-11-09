@@ -18,7 +18,7 @@ stop:
 # Переменные для подключения к БД
 DB_URL=postgres://postgres:postgre@localhost:5432/db-omega?sslmode=disable
 MIGRATIONS_PATH=backend/migrations
-VERSION = 2
+VERSION = 3
 
 # Полная настройка проекта
 full-setup:
