@@ -40,12 +40,14 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
     }
     
     setError('');
-    
+
     // Если редактируем объявление и есть новые изображения, сначала загружаем их
     if (adId && newImages.length > 0) {
-      await uploadNewImagesForEdit();
+      const ok = await uploadNewImagesForEdit();
+      // Если загрузка изображений не удалась — не продолжаем сохранение/редирект
+      if (!ok) return;
     }
-    
+
     onSubmit({
       title,
       description,
@@ -90,21 +92,23 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
   };
 
   const handleAddNewImages = async () => {
-    if (!adId || newImages.length === 0) return;
-    
+    if (!adId || newImages.length === 0) return true;
+
     try {
       setUploading(true);
       setError('');
-      
+
       await adsService.addImages(adId, newImages);
-      
+
       // Перезагружаем объявление чтобы получить обновленный список изображений
       const updatedAd = await adsService.getById(adId);
       setExistingImages(updatedAd.images || []);
       setNewImages([]); // Очищаем новые изображения
-      
+
+      return true;
     } catch (error) {
       setError(error.response?.data?.message || 'Ошибка загрузки изображений');
+      return false;
     } finally {
       setUploading(false);
     }
@@ -113,8 +117,10 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
   // Функция для автоматической загрузки изображений при редактировании
   const uploadNewImagesForEdit = async () => {
     if (adId && newImages.length > 0) {
-      await handleAddNewImages();
+      return await handleAddNewImages();
     }
+
+    return true;
   };
 
   const totalImages = existingImages.length + newImages.length;

@@ -29,77 +29,72 @@ const translateError = (message) => {
   // Проверяем частичные совпадения для более сложных сообщений
   for (const [key, translation] of Object.entries(ERROR_TRANSLATIONS)) {
     if (message.includes(key)) {
-      return message;
+      return translation;
     }
   }
   
   return message;
 };
 
-const getErrorDetails = (error) => {
-  let title = 'Ошибка';
-  let message = '';
-  let statusCode = null;
-  
+const getErrorMessage = (error) => {
   if (typeof error === 'string') {
-    message = translateError(error);
-  } else if (error.response) {
-    statusCode = error.response.status;
+    return translateError(error);
+  }
+  
+  if (error.response) {
     const errorData = error.response.data;
     
-    // Определяем заголовок по статусу
-    switch (statusCode) {
-      case 400:
-        title = 'Неверный запрос';
-        break;
-      case 401:
-        title = 'Необходима авторизация';
-        break;
-      case 403:
-        title = 'Доступ запрещен';
-        break;
-      case 404:
-        title = 'Не найдено';
-        break;
-      case 409:
-        title = 'Конфликт данных';
-        break;
-      case 413:
-        title = 'Файл слишком большой';
-        break;
-      case 415:
-        title = 'Неподдерживаемый тип файла';
-        break;
-      case 500:
-        title = 'Ошибка сервера';
-        break;
-      default:
-        title = `Ошибка ${statusCode}`;
-    }
-    
-    if (typeof errorData === 'string') {
-      message = translateError(errorData);
-    } else if (errorData) {
-      // Обрабатываем структурированные ошибки
-      if (errorData.message) {
-        message = translateError(errorData.message);
-      } else if (errorData.error) {
-        message = translateError(errorData.error);
+    // Сначала проверяем структурированные ошибки
+    if (errorData) {
+      if (typeof errorData === 'string') {
+        return translateError(errorData);
       }
       
-      // Специальная обработка для ошибок валидации
+      if (errorData.message) {
+        return translateError(errorData.message);
+      }
+      
+      if (errorData.error) {
+        return translateError(errorData.error);
+      }
+      
+      // Обработка ошибок валидации
       if (errorData.validation_errors) {
         const validationMessages = Object.values(errorData.validation_errors)
           .map(translateError)
           .join(', ');
-        message = validationMessages;
+        return validationMessages;
       }
     }
-  } else if (error.message) {
-    message = translateError(error.message);
+    
+    // Если нет структурированной ошибки, используем статус код
+    switch (error.response.status) {
+      case 400:
+        return 'Неверный запрос';
+      case 401:
+        return 'Необходима авторизация';
+      case 403:
+        return 'Доступ запрещен';
+      case 404:
+        return 'Ресурс не найден';
+      case 409:
+        return 'Конфликт данных';
+      case 413:
+        return 'Файл слишком большой';
+      case 415:
+        return 'Неподдерживаемый тип файла';
+      case 500:
+        return 'Внутренняя ошибка сервера';
+      default:
+        return `Ошибка ${error.response.status}`;
+    }
   }
   
-  return { title, message, statusCode };
+  if (error.message) {
+    return translateError(error.message);
+  }
+  
+  return 'Произошла неизвестная ошибка';
 };
 
 const ErrorAlert = ({ error, onClose, id = 'error-alert' }) => {
@@ -122,7 +117,7 @@ const ErrorAlert = ({ error, onClose, id = 'error-alert' }) => {
   
   if (!error) return null;
 
-  const { title, message } = getErrorDetails(error);
+  const message = getErrorMessage(error);
 
   return (
     <Alert 
@@ -133,8 +128,7 @@ const ErrorAlert = ({ error, onClose, id = 'error-alert' }) => {
       dismissible={!!onClose}
       className="mb-3"
     >
-      <Alert.Heading>{title}</Alert.Heading>
-      {message && <p className="mb-0">{message}</p>}
+      {message}
     </Alert>
   );
 };
