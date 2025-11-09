@@ -144,6 +144,7 @@ func (s *Service) UpdateAd(adID, userID uint, updateData *models.AdUpdateRequest
 	}
 	if updateData.SubcategoryID > 0 {
 		ad.SubcategoryID = updateData.SubcategoryID
+		ad.Subcategory = models.Subcategory{}
 	}
 
 	return s.repo.UpdateAd(ad)

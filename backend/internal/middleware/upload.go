@@ -19,9 +19,7 @@ const (
 var allowedMimeTypes = map[string]bool{
 	"image/jpeg": true,
 	"image/png":  true,
-	"image/gif":  true,
 	"image/webp": true,
-	"image/bmp":  true,
 }
 
 func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {

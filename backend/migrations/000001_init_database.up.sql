@@ -7,7 +7,8 @@ CREATE TABLE users (
     social_network VARCHAR(50),
     social_contact VARCHAR(100),
     password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Создание таблицы категорий
@@ -27,8 +28,8 @@ CREATE TABLE subcategories (
 -- Создание таблицы объявлений
 CREATE TABLE ads (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    description TEXT NOT NULL,
+    title VARCHAR(200) NOT NULL CHECK (LENGTH(title) BETWEEN 3 AND 100),
+    description TEXT NOT NULL CHECK (LENGTH(description) BETWEEN 20 AND 5000),
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     subcategory_id INTEGER NOT NULL REFERENCES subcategories(id) ON DELETE RESTRICT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -73,5 +74,10 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_ads_updated_at
     BEFORE UPDATE ON ads
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();

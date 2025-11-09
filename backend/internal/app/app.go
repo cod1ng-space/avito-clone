@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -170,64 +171,9 @@ func (a *App) initializeCategories() error {
 		return err
 	}
 
-	// Если категории уже есть, не добавляем их снова
-	if count > 0 {
-		return nil
-	}
-
-	// Создаем базовые категории
-	categories := []models.Category{
-		{Name: "Автомобили"},
-		{Name: "Мотоциклы и мототехника"},
-		{Name: "Недвижимость"},
-		{Name: "Работа"},
-		{Name: "Услуги"},
-		{Name: "Электроника"},
-		{Name: "Одежда"},
-		{Name: "Мебель"},
-		{Name: "Животные"},
-		{Name: "Другое"},
-	}
-
-	for _, category := range categories {
-		err = a.db.Create(&category).Error
-		if err != nil {
-			return err
-		}
-
-		// Добавляем базовые подкатегории для каждой категории
-		var subcategories []models.Subcategory
-		switch category.Name {
-		case "Автомобили":
-			subcategories = []models.Subcategory{
-				{Name: "Легковые автомобили", CategoryID: category.ID},
-				{Name: "Мотоциклы", CategoryID: category.ID},
-				{Name: "Грузовики", CategoryID: category.ID},
-			}
-		case "Недвижимость":
-			subcategories = []models.Subcategory{
-				{Name: "Квартиры", CategoryID: category.ID},
-				{Name: "Дома", CategoryID: category.ID},
-				{Name: "Коммерческая недвижимость", CategoryID: category.ID},
-			}
-		case "Работа":
-			subcategories = []models.Subcategory{
-				{Name: "Ищу работу", CategoryID: category.ID},
-				{Name: "Ищу сотрудника", CategoryID: category.ID},
-				{Name: "Фриланс", CategoryID: category.ID},
-			}
-		default:
-			subcategories = []models.Subcategory{
-				{Name: "Разное", CategoryID: category.ID},
-			}
-		}
-
-		for _, subcategory := range subcategories {
-			err = a.db.Create(&subcategory).Error
-			if err != nil {
-				return err
-			}
-		}
+	// Если категорий нет, то ошибка
+	if count == 0 {
+		return errors.New("no categories found")
 	}
 
 	return nil

@@ -24,12 +24,12 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
       return setError('Пожалуйста, заполните все обязательные поля');
     }
 
-    if (title.length < 3) {
-      return setError('Название должно содержать минимум 3 символа');
+    if (title.length < 3 || title.length > 100) {
+      return setError('Название должно содержать от 3 до 100 символов');
     }
 
-    if (description.length < 5) {
-      return setError('Описание должно содержать минимум 5 символов');
+    if (description.length < 20 || description.length > 5000) {
+      return setError('Описание должно содержать от 20 до 5000 символов');
     }
     
     setError('');
@@ -100,7 +100,7 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
       
       {!initialData && (
         <Form.Group className="mb-3" controlId="images">
-          <Form.Label>Изображения (до 7 штук)</Form.Label>
+          <Form.Label>Изображения</Form.Label>
           <Form.Control
             type="file"
             multiple
@@ -108,7 +108,7 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
             onChange={handleImageChange}
           />
           <Form.Text className="text-muted">
-            Можно выбрать несколько изображений (максимум 7)
+            Не более 7 в форматах jpeg, jpg, png или webp. Размер каждого файла не более 10 МБ
           </Form.Text>
         </Form.Group>
       )}
