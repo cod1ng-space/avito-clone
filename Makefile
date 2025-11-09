@@ -20,6 +20,19 @@ DB_URL=postgres://postgres:postgre@localhost:5432/db-omega?sslmode=disable
 MIGRATIONS_PATH=backend/migrations
 VERSION = 2
 
+# Полная настройка проекта
+full-setup:
+	@echo "Полная настройка проекта..."
+	make db-up
+	@echo "Проект готов к работе!"
+
+# Сброс и пересоздание БД
+db-reset:
+	@echo "Сброс базы данных..."
+	make db-drop || true
+	make db-up
+	@echo "База данных пересоздана!"
+
 # Миграции базы данных (через CLI migrate)
 db-up:
 	@echo "Применение всех миграций через CLI..."
@@ -48,3 +61,11 @@ db-drop:
 db-force:
 	@echo "Принудительная установка версии $(VERSION)..."
 	migrate -path $(MIGRATIONS_PATH) -database "$(DB_URL)" force $(VERSION)
+
+# Создание новой миграции
+migrate-create:
+	@read -p "Введите название миграции: " name; \
+	migrate create -ext sql -dir $(MIGRATIONS_PATH) -seq $$name
+
+# Посмотреть PID процесса на порту 5432
+# sudo lsof -ti:5432

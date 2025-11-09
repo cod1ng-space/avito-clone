@@ -1,7 +1,6 @@
 package app
 
 import (
-	"errors"
 	"fmt"
 	"log"
 
@@ -41,72 +40,11 @@ func (a *App) InitDB() error {
 	return nil
 }
 
-func (a *App) RunMigrations() error {
-	// Сначала удаляем представление и триггер, если они существуют
-	a.db.Exec("DROP VIEW IF EXISTS ad_search_view")
-	a.db.Exec("DROP TRIGGER IF EXISTS update_ads_updated_at ON ads")
-	a.db.Exec("DROP TRIGGER IF EXISTS update_users_updated_at ON users")
-	a.db.Exec("DROP FUNCTION IF EXISTS update_updated_at_column")
-
-	// Auto migrate всех моделей
-	err := a.db.AutoMigrate(
-		&models.User{},
-		&models.Category{},
-		&models.Subcategory{},
-		&models.Ad{},
-		&models.AdImage{},
-	)
+func (a *App) InitializeData() error {
+	// Только проверяем наличие категорий, миграции выполняются отдельно
+	err := a.checkCategoriesExist()
 	if err != nil {
-		return fmt.Errorf("failed to run migrations: %w", err)
-	}
-
-	// Создаем функцию для триггера
-	err = a.db.Exec(`
-        CREATE OR REPLACE FUNCTION update_updated_at_column()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            NEW.updated_at = CURRENT_TIMESTAMP;
-            RETURN NEW;
-        END;
-        $$ language 'plpgsql'
-    `).Error
-	if err != nil {
-		return fmt.Errorf("failed to create trigger function: %w", err)
-	}
-
-	// Создаем триггер
-	err = a.db.Exec(`
-        CREATE TRIGGER update_ads_updated_at
-            BEFORE UPDATE ON ads
-            FOR EACH ROW
-            EXECUTE FUNCTION update_updated_at_column()
-    `).Error
-	if err != nil {
-		return fmt.Errorf("failed to create trigger: %w", err)
-	}
-
-	// Создаем представление
-	err = a.db.Exec(`
-        CREATE OR REPLACE VIEW ad_search_view AS
-        SELECT
-            a.id AS ad_id,
-            a.title,
-            a.description,
-            c.name AS category_name,
-            s.name AS subcategory_name
-        FROM
-            ads a
-            JOIN subcategories s ON a.subcategory_id = s.id
-            JOIN categories c ON s.category_id = c.id
-    `).Error
-	if err != nil {
-		return fmt.Errorf("failed to create view: %w", err)
-	}
-
-	// Инициализируем базовые категории, если их нет
-	err = a.initializeCategories()
-	if err != nil {
-		return fmt.Errorf("failed to initialize categories: %w", err)
+		return fmt.Errorf("failed to check categories: %w", err)
 	}
 
 	return nil
@@ -165,7 +103,7 @@ func (a *App) Start() error {
 	return a.echo.Start(addr)
 }
 
-func (a *App) initializeCategories() error {
+func (a *App) checkCategoriesExist() error {
 	// Проверяем, есть ли уже категории
 	var count int64
 	err := a.db.Model(&models.Category{}).Count(&count).Error
@@ -173,9 +111,9 @@ func (a *App) initializeCategories() error {
 		return err
 	}
 
-	// Если категорий нет, то ошибка
+	// Если категорий нет, то предупреждаем (не ошибка, так как это может быть первый запуск)
 	if count == 0 {
-		return errors.New("no categories found")
+		log.Println("Внимание: Категории не найдены. Убедитесь, что выполнены все миграции: make db-up")
 	}
 
 	return nil
