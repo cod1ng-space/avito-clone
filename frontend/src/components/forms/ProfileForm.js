@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/auth';
+import ErrorAlert from '../ui/ErrorAlert';
 
 const ProfileForm = ({ onSuccess }) => {
   const { currentUser } = useAuth();
@@ -24,7 +25,7 @@ const ProfileForm = ({ onSuccess }) => {
 
   // Валидация номера телефона
   const validatePhone = (phoneNumber) => {
-    const phoneRegex = /^(\+7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    const phoneRegex = /^(\+7|8)?[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
     return phoneRegex.test(phoneNumber);
   };
 
@@ -68,7 +69,7 @@ const ProfileForm = ({ onSuccess }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      {error && <Alert variant="danger">{error}</Alert>}
+      <ErrorAlert error={error} onClose={() => setError('')} id="profile-form-error" />
       
       <Form.Group className="mb-3" controlId="username">
         <Form.Label>Имя пользователя</Form.Label>

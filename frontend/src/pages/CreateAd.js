@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Alert } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { adsService } from '../services/ads';
 import { categoriesService } from '../services/categories';
 import AdForm from '../components/forms/AdForm';
+import ErrorAlert from '../components/ui/ErrorAlert';
 
 const CreateAd = () => {
   const [categories, setCategories] = useState([]);
@@ -29,26 +30,37 @@ const CreateAd = () => {
       setLoading(true);
       setError('');
       
-      // Сначала создаем объявление
-      const newAd = await adsService.create(adData);
+      let newAd;
       
-      // Затем загружаем изображения, если есть
+      // Используем новый API если есть изображения, иначе старый
       if (images && images.length > 0) {
-        const formData = new FormData();
-        images.forEach(image => {
-          formData.append('images', image);
-        });
-        
-        await adsService.addImages(newAd.id, formData);
+        newAd = await adsService.createWithImages(adData, images);
+      } else {
+        newAd = await adsService.create(adData);
       }
       
       navigate(`/ads/${newAd.id}`);
     } catch (error) {
       console.error('Ошибка создания объявления:', error);
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error ||
-                          error.message || 
-                          'Ошибка создания объявления';
+      
+      // Улучшенная обработка ошибок
+      let errorMessage = 'Ошибка создания объявления';
+      
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+          if (error.response.data.error) {
+            errorMessage += `: ${error.response.data.error}`;
+          }
+        } else if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -61,7 +73,7 @@ const CreateAd = () => {
         <Col md={8}>
           <h1 className="mb-4">Создание нового объявления</h1>
           
-          {error && <Alert variant="danger">{error}</Alert>}
+          <ErrorAlert error={error} onClose={() => setError('')} id="create-ad-error" />
           
           <AdForm
             categories={categories}

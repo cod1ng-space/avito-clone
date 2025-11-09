@@ -1,5 +1,6 @@
 -- Удаление триггера
 DROP TRIGGER IF EXISTS update_ads_updated_at ON ads;
+DROP TRIGGER IF EXISTS update_users_updated_at ON ads;
 
 -- Удаление функции
 DROP FUNCTION IF EXISTS update_updated_at_column();

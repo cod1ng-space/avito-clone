@@ -148,6 +148,7 @@ func (a *App) RegisterRoutes() {
 	protected.PUT("/profile", userHandler.UpdateProfile)
 
 	protected.POST("/ads", itemHandler.CreateAd)
+	protected.POST("/ads/with-images", itemHandler.CreateAdWithImages, middleware.UploadFiles)
 	protected.GET("/my-ads", itemHandler.GetUserAds)
 	protected.PUT("/ads/:id", itemHandler.UpdateAd)
 	protected.DELETE("/ads/:id", itemHandler.DeleteAd)

@@ -28,7 +28,7 @@ const CategoryAds = () => {
     const loadAds = async () => {
       try {
         setLoading(true);
-        const data = await adsService.search('', id, currentPage);
+        const data = await adsService.search('', id, '', currentPage);
         setAds(data.ads);
         setTotalPages(Math.ceil(data.total / data.limit));
       } catch (error) {

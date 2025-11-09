@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -40,52 +41,67 @@ func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusBadRequest, "File too large")
 		}
 
-		files := c.Request().MultipartForm.File["images"]
+		var allFiles [][]*multipart.FileHeader
+
+		// Проверяем разные возможные имена полей для файлов
+		for key, files := range c.Request().MultipartForm.File {
+			if strings.HasPrefix(key, "image") || key == "images" {
+				allFiles = append(allFiles, files)
+			}
+		}
+
+		if len(allFiles) == 0 {
+			return echo.NewHTTPError(http.StatusBadRequest, "No image files found")
+		}
+
 		var filePaths []string
 
-		for _, fileHeader := range files {
-			// Open file
-			file, err := fileHeader.Open()
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to open file")
-			}
-			defer file.Close()
+		// Обрабатываем все найденные файлы
+		for _, files := range allFiles {
+			for _, fileHeader := range files {
+				// Open file
+				file, err := fileHeader.Open()
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to open file")
+				}
+				defer file.Close()
 
-			// Check MIME type
-			buffer := make([]byte, 512)
-			if _, err = file.Read(buffer); err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to read file")
-			}
-			if _, err = file.Seek(0, 0); err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to seek file")
-			}
+				// Check MIME type
+				buffer := make([]byte, 512)
+				if _, err = file.Read(buffer); err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to read file")
+				}
+				if _, err = file.Seek(0, 0); err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to seek file")
+				}
 
-			mimeType := http.DetectContentType(buffer)
-			if !allowedMimeTypes[mimeType] {
-				return echo.NewHTTPError(http.StatusBadRequest, "Invalid file type: "+mimeType)
-			}
+				mimeType := http.DetectContentType(buffer)
+				if !allowedMimeTypes[mimeType] {
+					return echo.NewHTTPError(http.StatusBadRequest, "Invalid file type: "+mimeType)
+				}
 
-			// Generate unique filename
-			ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
-			if ext == "" {
-				ext = "." + strings.Split(mimeType, "/")[1]
-			}
-			filename := generateUniqueFilename(ext)
+				// Generate unique filename
+				ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
+				if ext == "" {
+					ext = "." + strings.Split(mimeType, "/")[1]
+				}
+				filename := generateUniqueFilename(ext)
 
-			// Create destination file
-			dstPath := filepath.Join(uploadDir, filename)
-			dst, err := os.Create(dstPath)
-			if err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create file")
-			}
-			defer dst.Close()
+				// Create destination file
+				dstPath := filepath.Join(uploadDir, filename)
+				dst, err := os.Create(dstPath)
+				if err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create file")
+				}
+				defer dst.Close()
 
-			// Copy file content
-			if _, err = io.Copy(dst, file); err != nil {
-				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save file")
-			}
+				// Copy file content
+				if _, err = io.Copy(dst, file); err != nil {
+					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save file")
+				}
 
-			filePaths = append(filePaths, filename)
+				filePaths = append(filePaths, filename)
+			}
 		}
 
 		c.Set("uploadedFiles", filePaths)

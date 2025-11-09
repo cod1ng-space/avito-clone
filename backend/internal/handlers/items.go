@@ -49,6 +49,66 @@ func (h *ItemHandler) CreateAd(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ad)
 }
 
+func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
+	userID := middleware.GetUserID(c)
+
+	// Получаем данные объявления из form-data
+	title := c.FormValue("title")
+	description := c.FormValue("description")
+	subcategoryIDStr := c.FormValue("subcategory_id")
+
+	if title == "" || description == "" || subcategoryIDStr == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
+			"message": "Отсутствуют обязательные поля",
+			"error":   "title, description и subcategory_id обязательны",
+		})
+	}
+
+	// Преобразуем subcategory_id в uint
+	subcategoryID, err := strconv.ParseUint(subcategoryIDStr, 10, 32)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
+			"message": "Неверный ID подкатегории",
+			"error":   err.Error(),
+		})
+	}
+
+	// Создаем запрос для валидации
+	req := models.AdCreateRequest{
+		Title:         title,
+		Description:   description,
+		SubcategoryID: uint(subcategoryID),
+	}
+
+	if err := c.Validate(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
+			"message": "Ошибка валидации данных",
+			"error":   err.Error(),
+		})
+	}
+
+	// Создаем объявление
+	ad := &models.Ad{
+		Title:         req.Title,
+		Description:   req.Description,
+		UserID:        userID,
+		SubcategoryID: req.SubcategoryID,
+	}
+
+	// Получаем загруженные изображения (если есть)
+	uploadedFiles, _ := c.Get("uploadedFiles").([]string)
+
+	// Создаем объявление и добавляем изображения в одной транзакции
+	if err := h.service.CreateAdWithImages(ad, uploadedFiles); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
+			"message": "Ошибка создания объявления",
+			"error":   err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, ad)
+}
+
 func (h *ItemHandler) GetAd(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -98,6 +158,7 @@ func (h *ItemHandler) GetUserAds(c echo.Context) error {
 func (h *ItemHandler) SearchAds(c echo.Context) error {
 	query := c.QueryParam("q")
 	categoryStr := c.QueryParam("category")
+	subcategoryStr := c.QueryParam("subcategory")
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
@@ -117,7 +178,16 @@ func (h *ItemHandler) SearchAds(c echo.Context) error {
 		categoryID = uint(catID)
 	}
 
-	ads, total, err := h.service.SearchAds(query, categoryID, page, limit)
+	var subcategoryID uint
+	if subcategoryStr != "" {
+		subID, err := strconv.ParseUint(subcategoryStr, 10, 0)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "Invalid subcategory ID")
+		}
+		subcategoryID = uint(subID)
+	}
+
+	ads, total, err := h.service.SearchAds(query, categoryID, subcategoryID, page, limit)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

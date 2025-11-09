@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Button, Alert, Card } from 'react-bootstrap';
+import { Form, Button, Card } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import ErrorAlert from '../ui/ErrorAlert';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ const LoginForm = () => {
     <Card>
       <Card.Body>
         <h2 className="text-center mb-4">Вход в систему</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
+        <ErrorAlert error={error} onClose={() => setError('')} id="login-form-error" />
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="email">
             <Form.Label>Электронная почта</Form.Label>

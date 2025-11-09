@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Row, Col, Card } from 'react-bootstrap';
+import { adsService } from '../../services/ads';
+import { getImageUrl } from '../../utils/imageUrl';
+import ErrorAlert from '../ui/ErrorAlert';
 
-const AdForm = ({ categories, onSubmit, loading, initialData }) => {
+const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [subcategoryId, setSubcategoryId] = useState('');
-  const [images, setImages] = useState([]);
+  const [newImages, setNewImages] = useState([]); // Новые файлы для загрузки
+  const [existingImages, setExistingImages] = useState([]); // Существующие изображения
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState({});
 
   useEffect(() => {
     if (initialData) {
@@ -14,10 +20,11 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
       setDescription(initialData.description);
       // Ensure we store subcategory id as a string so it matches option values
       setSubcategoryId(initialData.subcategory_id ? String(initialData.subcategory_id) : '');
+      setExistingImages(initialData.images || []);
     }
   }, [initialData]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!title || !description || !subcategoryId) {
@@ -34,28 +41,87 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
     
     setError('');
     
+    // Если редактируем объявление и есть новые изображения, сначала загружаем их
+    if (adId && newImages.length > 0) {
+      await uploadNewImagesForEdit();
+    }
+    
     onSubmit({
       title,
       description,
       subcategory_id: parseInt(subcategoryId)
-    }, images);
+    }, newImages);
   };
 
-  const handleImageChange = (e) => {
+  const handleNewImageChange = (e) => {
     const files = Array.from(e.target.files);
+    const totalImages = existingImages.length + newImages.length + files.length;
     
-    if (files.length > 7) {
+    if (totalImages > 7) {
       setError('Можно загрузить максимум 7 изображений');
       return;
     }
     
-    setImages(files);
+    setNewImages(prev => [...prev, ...files]);
     setError('');
+    e.target.value = ''; // Очищаем input для возможности повторного выбора
   };
+
+  const handleRemoveNewImage = (index) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteExistingImage = async (imageId) => {
+    if (!adId) return; // Можно удалять только у существующих объявлений
+    
+    try {
+      setDeleting(prev => ({...prev, [imageId]: true}));
+      
+      await adsService.deleteImage(imageId);
+      
+      // Обновляем локальный список изображений
+      setExistingImages(prev => prev.filter(img => img.id !== imageId));
+      
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка удаления изображения');
+    } finally {
+      setDeleting(prev => ({...prev, [imageId]: false}));
+    }
+  };
+
+  const handleAddNewImages = async () => {
+    if (!adId || newImages.length === 0) return;
+    
+    try {
+      setUploading(true);
+      setError('');
+      
+      await adsService.addImages(adId, newImages);
+      
+      // Перезагружаем объявление чтобы получить обновленный список изображений
+      const updatedAd = await adsService.getById(adId);
+      setExistingImages(updatedAd.images || []);
+      setNewImages([]); // Очищаем новые изображения
+      
+    } catch (error) {
+      setError(error.response?.data?.message || 'Ошибка загрузки изображений');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Функция для автоматической загрузки изображений при редактировании
+  const uploadNewImagesForEdit = async () => {
+    if (adId && newImages.length > 0) {
+      await handleAddNewImages();
+    }
+  };
+
+  const totalImages = existingImages.length + newImages.length;
 
   return (
     <Form onSubmit={handleSubmit}>
-      {error && <Alert variant="danger">{error}</Alert>}
+      <ErrorAlert error={error} onClose={() => setError('')} id="ad-form-error" />
       
       <Form.Group className="mb-3" controlId="title">
         <Form.Label>Название</Form.Label>
@@ -97,24 +163,107 @@ const AdForm = ({ categories, onSubmit, loading, initialData }) => {
           ))}
         </Form.Select>
       </Form.Group>
+
+      {/* Блок управления изображениями */}
+      <div className="mb-4">
+        <h5>Изображения ({totalImages}/7)</h5>
+        
+        {/* Объединенный список всех изображений */}
+        {(existingImages.length > 0 || newImages.length > 0) && (
+          <Row className="mb-3">
+            {/* Существующие изображения */}
+            {existingImages.map((image) => (
+              <Col key={`existing-${image.id}`} md={3} sm={4} xs={6} className="mb-3">
+                <Card>
+                  <div className="position-relative">
+                    <Card.Img 
+                      variant="top" 
+                      src={getImageUrl(image.file_path)} 
+                      style={{ height: '150px', objectFit: 'cover' }}
+                    />
+                    <div className="position-absolute top-0 start-0 bg-success text-white px-2 py-1" 
+                         style={{fontSize: '0.75rem', borderRadius: '0 0 0.25rem 0'}}>
+                      Сохранено
+                    </div>
+                  </div>
+                  {adId && (
+                    <Card.Body className="p-2">
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        disabled={deleting[image.id]}
+                        onClick={() => handleDeleteExistingImage(image.id)}
+                        className="w-100"
+                      >
+                        {deleting[image.id] ? 'Удаление...' : 'Удалить'}
+                      </Button>
+                    </Card.Body>
+                  )}
+                </Card>
+              </Col>
+            ))}
+            
+            {/* Новые изображения для загрузки */}
+            {newImages.map((file, index) => (
+              <Col key={`new-${index}`} md={3} sm={4} xs={6} className="mb-3">
+                <Card>
+                  <div className="position-relative">
+                    <Card.Img 
+                      variant="top" 
+                      src={URL.createObjectURL(file)}
+                      style={{ height: '150px', objectFit: 'cover' }}
+                    />
+                    <div className="position-absolute top-0 start-0 bg-warning text-dark px-2 py-1" 
+                         style={{fontSize: '0.75rem', borderRadius: '0 0 0.25rem 0'}}>
+                      Новое
+                    </div>
+                  </div>
+                  <Card.Body className="p-2">
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleRemoveNewImage(index)}
+                      className="w-100"
+                    >
+                      Убрать
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+        
+        {/* Добавление новых изображений */}
+        {totalImages < 7 && (
+          <Form.Group controlId="new-images">
+            <Form.Label>Добавить изображения</Form.Label>
+            <Form.Control
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleNewImageChange}
+            />
+            <Form.Text className="text-muted">
+              Можно загрузить ещё {7 - totalImages} изображений. 
+              Форматы: jpeg, jpg, png, webp. Размер файла до 10 МБ.
+            </Form.Text>
+          </Form.Group>
+        )}
+        
+        {totalImages === 0 && !initialData && (
+          <Alert variant="info">
+            Добавьте изображения, чтобы сделать объявление более привлекательным.
+          </Alert>
+        )}
+      </div>
       
-      {!initialData && (
-        <Form.Group className="mb-3" controlId="images">
-          <Form.Label>Изображения</Form.Label>
-          <Form.Control
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-          <Form.Text className="text-muted">
-            Не более 7 в форматах jpeg, jpg, png или webp. Размер каждого файла не более 10 МБ
-          </Form.Text>
-        </Form.Group>
-      )}
-      
-      <Button disabled={loading} type="submit">
-        {initialData ? 'Обновить объявление' : 'Создать объявление'}
+      <Button 
+        disabled={loading || uploading} 
+        type="submit"
+        variant="primary"
+      >
+        {loading || uploading ? 'Сохраняем...' : (initialData ? 'Обновить объявление' : 'Создать объявление')}
       </Button>
     </Form>
   );

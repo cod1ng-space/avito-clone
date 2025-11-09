@@ -18,7 +18,7 @@ export const adsService = {
     return response.data;
   },
 
-  search: async (query, categoryId, page = 1, limit = 12) => {
+  search: async (query, categoryId, subcategoryId, page = 1, limit = 12) => {
       const params = {
           q: query || '',
           page,
@@ -27,6 +27,10 @@ export const adsService = {
       
       if (categoryId) {
           params.category = categoryId;
+      }
+      
+      if (subcategoryId) {
+          params.subcategory = subcategoryId;
       }
 
       const response = await api.get('/ads', {
@@ -40,6 +44,27 @@ export const adsService = {
     return response.data;
   },
 
+  createWithImages: async (adData, images) => {
+    const formData = new FormData();
+    
+    // Добавляем данные объявления
+    formData.append('title', adData.title);
+    formData.append('description', adData.description);
+    formData.append('subcategory_id', adData.subcategory_id.toString());
+    
+    // Добавляем изображения если есть
+    if (images && images.length > 0) {
+      images.forEach((image, index) => {
+        formData.append(`image${index}`, image);
+      });
+    }
+    
+    const response = await api.post('/ads/with-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
   update: async (id, adData) => {
     const response = await api.put(`/ads/${id}`, adData);
     return response.data;
@@ -50,7 +75,12 @@ export const adsService = {
     return response.data;
   },
 
-  addImages: async (id, formData) => {
+  addImages: async (id, files) => {
+    const formData = new FormData();
+    files.forEach((file, index) => {
+      formData.append(`image${index}`, file);
+    });
+    
     const response = await api.post(`/ads/${id}/images`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
