@@ -45,6 +45,7 @@ func (a *App) RunMigrations() error {
 	// Сначала удаляем представление и триггер, если они существуют
 	a.db.Exec("DROP VIEW IF EXISTS ad_search_view")
 	a.db.Exec("DROP TRIGGER IF EXISTS update_ads_updated_at ON ads")
+	a.db.Exec("DROP TRIGGER IF EXISTS update_users_updated_at ON users")
 	a.db.Exec("DROP FUNCTION IF EXISTS update_updated_at_column")
 
 	// Auto migrate всех моделей

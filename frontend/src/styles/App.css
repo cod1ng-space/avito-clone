@@ -13,3 +13,8 @@
 .img-thumbnail:hover {
   transform: scale(1.05);
 }
+
+.login-dropdown>div {
+  left: unset !important;
+  right: 0;
+}
