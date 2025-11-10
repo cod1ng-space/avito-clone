@@ -103,7 +103,7 @@ func (r *Repository) SearchAds(query string, categoryID, subcategoryID uint, pag
 		return nil, 0, err
 	}
 
-	err = dbQuery.Order("created_at DESC").
+	err = dbQuery.Order("created_at DESC, id DESC").
 		Offset(offset).Limit(limit).
 		Find(&ads).Error
 

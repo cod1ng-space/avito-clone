@@ -111,7 +111,7 @@ func (s *Service) GetUserAds(userID uint, page, limit int) ([]models.Ad, int64, 
 		page = 1
 	}
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
 	return s.repo.GetUserAds(userID, page, limit)
 }
@@ -121,7 +121,7 @@ func (s *Service) SearchAds(query string, categoryID, subcategoryID uint, page, 
 		page = 1
 	}
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
 	return s.repo.SearchAds(query, categoryID, subcategoryID, page, limit)
 }
