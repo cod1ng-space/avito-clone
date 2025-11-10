@@ -26,9 +26,9 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Run migrations
-	if err := application.RunMigrations(); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+	// Initialize data (check categories existence)
+	if err := application.InitializeData(); err != nil {
+		log.Fatalf("Failed to initialize data: %v", err)
 	}
 
 	// Initialize Echo

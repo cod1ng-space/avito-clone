@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Button, Alert, Card } from 'react-bootstrap';
+import { Form, Button, Card } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import ErrorAlert from '../ui/ErrorAlert';
 
 const RegisterForm = () => {
   const [email, setEmail] = useState('');
@@ -18,7 +19,7 @@ const RegisterForm = () => {
 
   // Валидация номера телефона
   const validatePhone = (phoneNumber) => {
-    const phoneRegex = /^(\+7|8)?[\s\-]?\(?[0-9]{3}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+    const phoneRegex = /^(\+7|8)?[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
     return phoneRegex.test(phoneNumber);
   };
 
@@ -69,7 +70,7 @@ const RegisterForm = () => {
     <Card>
       <Card.Body>
         <h2 className="text-center mb-4">Регистрация</h2>
-        {error && <Alert variant="danger">{error}</Alert>}
+        <ErrorAlert error={error} onClose={() => setError('')} id="register-form-error" />
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="email">
             <Form.Label>Электронная почта</Form.Label>

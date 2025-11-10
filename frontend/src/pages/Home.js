@@ -15,6 +15,7 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -31,7 +32,8 @@ const Home = () => {
             setLoading(true);
             const data = await adsService.search(
                 searchQuery, 
-                selectedCategory, 
+                selectedCategory,
+                selectedSubcategory,
                 currentPage
             );
             
@@ -48,7 +50,7 @@ const Home = () => {
 
     loadCategories();
     loadAds();
-  }, [currentPage, searchQuery, selectedCategory]);
+  }, [currentPage, searchQuery, selectedCategory, selectedSubcategory]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -57,6 +59,11 @@ const Home = () => {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
+    setCurrentPage(1);
+  };
+
+  const handleSubcategoryChange = (subcategoryId) => {
+    setSelectedSubcategory(subcategoryId);
     setCurrentPage(1);
   };
 
@@ -70,7 +77,9 @@ const Home = () => {
           <CategorySelector 
             categories={categories}
             selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
             onCategoryChange={handleCategoryChange}
+            onSubcategoryChange={handleSubcategoryChange}
           />
         </Col>
       </Row>

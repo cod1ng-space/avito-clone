@@ -82,8 +82,9 @@ type UserUpdateRequest struct {
 }
 
 type SearchParams struct {
-	Query    string `query:"q"`
-	Page     int    `query:"page"`
-	Limit    int    `query:"limit"`
-	Category string `query:"category"`
+	Query       string `query:"q"`
+	Page        int    `query:"page"`
+	Limit       int    `query:"limit"`
+	Category    string `query:"category"`
+	Subcategory string `query:"subcategory"`
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Alert } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 import { adsService } from '../services/ads';
 import { categoriesService } from '../services/categories';
 import AdForm from '../components/forms/AdForm';
+import ErrorAlert from '../components/ui/ErrorAlert';
 
 const EditAd = () => {
   const { id } = useParams();
@@ -51,6 +52,8 @@ const EditAd = () => {
     }
   };
 
+
+
   if (!ad) return <Container className="text-center">Загрузка...</Container>;
 
   return (
@@ -59,13 +62,14 @@ const EditAd = () => {
         <Col md={8}>
           <h1 className="mb-4">Редактировать объявление</h1>
           
-          {error && <Alert variant="danger">{error}</Alert>}
+          <ErrorAlert error={error} onClose={() => setError('')} id="edit-ad-error" />
           
           <AdForm
             categories={categories}
             onSubmit={handleSubmit}
             loading={loading}
             initialData={ad}
+            adId={parseInt(id)}
           />
         </Col>
       </Row>

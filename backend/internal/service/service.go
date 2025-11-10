@@ -111,19 +111,19 @@ func (s *Service) GetUserAds(userID uint, page, limit int) ([]models.Ad, int64, 
 		page = 1
 	}
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
 	return s.repo.GetUserAds(userID, page, limit)
 }
 
-func (s *Service) SearchAds(query string, categoryID uint, page, limit int) ([]models.Ad, int64, error) {
+func (s *Service) SearchAds(query string, categoryID, subcategoryID uint, page, limit int) ([]models.Ad, int64, error) {
 	if page < 1 {
 		page = 1
 	}
 	if limit < 1 {
-		limit = 10
+		limit = 12
 	}
-	return s.repo.SearchAds(query, categoryID, page, limit)
+	return s.repo.SearchAds(query, categoryID, subcategoryID, page, limit)
 }
 
 func (s *Service) UpdateAd(adID, userID uint, updateData *models.AdUpdateRequest) error {
@@ -215,4 +215,9 @@ func (s *Service) DeleteAdImage(imageID, userID uint) error {
 	}
 
 	return s.repo.DeleteAdImage(imageID)
+}
+
+func (s *Service) CreateAdWithImages(ad *models.Ad, imagePaths []string) error {
+	// Создаем объявление и изображения в одной транзакции
+	return s.repo.CreateAdWithImages(ad, imagePaths)
 }
