@@ -108,10 +108,8 @@ const ProfileForm = ({ onSuccess }) => {
           <option value="">Выберите социальную сеть</option>
           <option value="Telegram">Telegram</option>
           <option value="WhatsApp">WhatsApp</option>
-          <option value="Viber">Viber</option>
-          <option value="Instagram">Instagram</option>
-          <option value="Facebook">Facebook</option>
           <option value="VK">ВКонтакте</option>
+          <option value="Other">Другое</option>
         </Form.Select>
       </Form.Group>
       
