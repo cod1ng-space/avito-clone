@@ -4,18 +4,18 @@ import (
 	"net/http"
 	"strconv"
 
+	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
 	"adboard/internal/models"
-	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type ItemHandler struct {
-	service *service.Service
+	service interfaces.Service
 }
 
-func NewItemHandler(service *service.Service) *ItemHandler {
+func NewItemHandler(service interfaces.Service) interfaces.ItemHandler {
 	return &ItemHandler{service: service}
 }
 

@@ -4,17 +4,17 @@ import (
 	"net/http"
 	"strconv"
 
+	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
-	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type ImageHandler struct {
-	service *service.Service
+	service interfaces.Service
 }
 
-func NewImageHandler(service *service.Service) *ImageHandler {
+func NewImageHandler(service interfaces.Service) interfaces.ImageHandler {
 	return &ImageHandler{service: service}
 }
 

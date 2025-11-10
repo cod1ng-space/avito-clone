@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"net/http"
 
+	"adboard/internal/interfaces"
 	"adboard/internal/models"
-	"adboard/internal/service"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
 type AuthHandler struct {
-	service *service.Service
+	service interfaces.Service
 }
 
-func NewAuthHandler(service *service.Service) *AuthHandler {
+func NewAuthHandler(service interfaces.Service) interfaces.AuthHandler {
 	return &AuthHandler{service: service}
 }
 

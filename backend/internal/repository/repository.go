@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"adboard/internal/interfaces"
 	"adboard/internal/models"
 
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type Repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *Repository {
+func NewRepository(db *gorm.DB) interfaces.Repository {
 	return &Repository{db: db}
 }
 

@@ -3,16 +3,16 @@ package handlers
 import (
 	"net/http"
 
-	"adboard/internal/service"
+	"adboard/internal/interfaces"
 
 	"github.com/labstack/echo/v4"
 )
 
 type CategoryHandler struct {
-	service *service.Service
+	service interfaces.Service
 }
 
-func NewCategoryHandler(service *service.Service) *CategoryHandler {
+func NewCategoryHandler(service interfaces.Service) interfaces.CategoryHandler {
 	return &CategoryHandler{service: service}
 }
 
