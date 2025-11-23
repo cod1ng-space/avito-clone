@@ -4,17 +4,19 @@ services:
     image: postgres:15-alpine
     container_name: adboard-postgres
     environment:
-      POSTGRES_DB: db-omega
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgre
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./backend/sql/categories.sql:/docker-entrypoint-initdb.d/02-categories.sql
+    networks:
+      - adboard-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,17 +33,19 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      JWT_SECRET: super_secret_jwt_key
+      JWT_SECRET: ${JWT_SECRET}
       UPLOAD_DIR: /app/uploads/images
       SERVER_PORT: 8080
     ports:
       - "${SERVER_PORT}:8080"
     volumes:
       - ./backend/uploads:/app/uploads
+    networks:
+      - adboard-network
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped
+    restart: on-failure:3
 
   # Frontend сервис (для продакшена)
   frontend:
@@ -51,9 +55,15 @@ services:
     container_name: adboard-frontend
     ports:
       - "3000:3000"
+    networks:
+      - adboard-network
     depends_on:
       - backend
     restart: unless-stopped
+
+networks:
+  adboard-network:
+    driver: bridge
 
 volumes:
   postgres_data:

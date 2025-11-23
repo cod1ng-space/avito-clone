@@ -64,12 +64,13 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 (13, 'Тернеция в аквариуме', 'Группа из 6 тернеций, здоровые и активные. Подходят для общего аквариума.', 6,
  (SELECT id FROM subcategories WHERE name = 'Аквариум и террариум' AND category_id = (SELECT id FROM categories WHERE name = 'Животные'))),
 
--- Техника и электроника → Телефоны и гаджеты
+-- Техника и электроника → Аудио и видео
 (14, 'AirPods 1 поколения', 'Оригинал, в отличном состоянии. Чехол не родной, но новый.', 7,
- (SELECT id FROM subcategories WHERE name = 'Телефоны и гаджеты' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
--- Техника и электроника → Телефоны и гаджеты
+ (SELECT id FROM subcategories WHERE name = 'Аудио и видео' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
+-- Техника и электроника → Аудио и видео
 (15, 'EarPods Apple', 'Оригинальные проводные наушники от Apple. Без повреждений.', 1,
- (SELECT id FROM subcategories WHERE name = 'Телефоны и гаджеты' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
+ (SELECT id FROM subcategories WHERE name = 'Аудио и видео' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
+
 -- Техника и электроника → Телефоны и гаджеты
 (16, 'iPhone 7 в идеале', '128 ГБ, чёрный, без царапин, батарея на 90%. В комплекте всё родное.', 2,
  (SELECT id FROM subcategories WHERE name = 'Телефоны и гаджеты' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
@@ -92,6 +93,13 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 -- Техника и электроника → Компьютеры и ноутбуки
 (22, 'Игровой ПК #4', 'Полностью собранный системный блок. Все комплектующие новые 2024 года.', 1,
  (SELECT id FROM subcategories WHERE name = 'Компьютеры и ноутбуки' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
+
+-- Техника и электроника → Бытовая техника
+(123, 'Продам холодильник', 'Продам холодильник отличном состоянии. Использовался менее года. ', 3,
+ (SELECT id FROM subcategories WHERE name = 'Бытовая техника' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
+-- Техника и электроника → Бытовая техника
+(124, 'Стиральная мащина', 'Продам стиральную машину. Цена 5000 рублей.', 4,
+ (SELECT id FROM subcategories WHERE name = 'Бытовая техника' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
 
 -- Мода и стиль → Аксессуары
 (23, 'Золотые серьги', 'Классические золотые серьги 585 пробы. В идеальном состоянии.', 2,
@@ -151,6 +159,10 @@ INSERT INTO ad_images (ad_id, file_path, order_index) VALUES
 (21, 'technology_and_electronics_gaming_computer_3.webp', 1),
 (22, 'technology_and_electronics_gaming_computer_4.jpg', 1),
 
+-- Бытовая техника
+(123, 'household_appliances_refrigerator_atlant.webp', 1),
+(124, 'household_appliances_washing_machine.jpg', 1),
+
 -- Аксессуары и одежда
 (23, 'accessories_earrings_gold.jpg', 1),
 (24, 'shoes_old_brown.webp', 1),
@@ -177,14 +189,15 @@ WITH cat AS (
 INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 
 -- Недвижимость → Снять жильё
-(29, 'Сдам 1-комнатную квартиру', 'Уютная однушка в центре, метро рядом. Есть вся техника и мебель. Цена — 45 000 ₽/мес.', 8,
- (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
+(29, 'Продам 1-комнатную квартиру', 'Уютная однушка в центре, метро рядом. Есть вся техника и мебель. Цена — 10 000 000 ₽/мес.', 8,
+ (SELECT id FROM subcategories WHERE name = 'Купить жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Снять жильё
-(30, 'Квартира у метро', 'Сдается 2-комнатная квартира в новом доме. Ремонт, паркет, застеклённый балкон.', 9,
- (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
+(30, 'Квартира у метро', 'Продаётся 2-комнатная квартира в новом доме. Ремонт, паркет, застеклённый балкон.', 9,
+ (SELECT id FROM subcategories WHERE name = 'Купить жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Снять жильё
-(31, 'Современная 1-комнатная', 'Сдам квартиру с евроремонтом. Без животных, только для некурящих.', 10,
- (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
+(31, 'Современная студия', 'Продам студию с евроремонтом. Цена договорная.', 10,
+ (SELECT id FROM subcategories WHERE name = 'Купить жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
+
 -- Недвижимость → Снять жильё
 (32, 'Уютная квартира в спальном районе', 'Тихий двор, развитая инфраструктура. Есть Wi-Fi и стиральная машина.', 1,
  (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
@@ -192,7 +205,7 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 (33, 'Квартира с панорамным видом', 'Высокий этаж, вид на город. Дом с консьержем и подземной парковкой.', 2,
  (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Снять жильё
-(34, 'Сдам студию у парка', 'Идеально для одного. Вся мебель новая, кондиционер, бойлер.', 3,
+(34, 'Сдам студию у парка', 'Идеально для одного. Вся мебель новая, кондиционер, бойлер. Без животных, только для некурящих. Цена — 60 000 ₽/мес.', 3,
  (SELECT id FROM subcategories WHERE name = 'Снять жильё' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Снять жильё
 (35, 'Квартира с евроремонтом', 'Сдается на длительный срок. Все документы в порядке.', 4,
@@ -202,10 +215,10 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 (36, 'Офис в бизнес-центре', 'Аренда офиса 50 м² в центре. Отдельный вход, парковка, охрана.', 5,
  (SELECT id FROM subcategories WHERE name = 'Коммерческая недвижимость' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Коммерческая недвижимость
-(37, 'Торговое помещение', 'Помещение 80 м² на первом этаже. Отличная проходимость.', 6,
+(37, 'Помещение под бизнес', 'Помещение 80 м² на первом этаже. Отличная проходимость.', 6,
  (SELECT id FROM subcategories WHERE name = 'Коммерческая недвижимость' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 -- Недвижимость → Коммерческая недвижимость
-(38, 'Склад под аренду', 'Сухой склад 200 м² с подъездом для фур. Недалеко от МКАД.', 7,
+(38, 'Офис в Москва Сити', 'Офис в Москва Сити в башне Евразия на 43 этаже.', 7,
  (SELECT id FROM subcategories WHERE name = 'Коммерческая недвижимость' AND category_id = (SELECT id FROM categories WHERE name = 'Недвижимость'))),
 
 -- Недвижимость → Земельные участки
@@ -226,7 +239,7 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
  (SELECT id FROM subcategories WHERE name = 'Легковые авто' AND category_id = (SELECT id FROM categories WHERE name = 'Транспорт'))),
 -- Транспорт → Грузовики и спецтехника
 (44, 'Синий фургон, в рабочем состоянии', 'Volkswagen Transporter, 2018 г., объем 9 м³, климат-контроль.', 3,
- (SELECT id FROM subcategories WHERE name = 'Грузовики и спецтехника' AND category_id = (SELECT id FROM categories WHERE name = 'Транспорт'))),
+ (SELECT id FROM subcategories WHERE name = 'Легковые авто' AND category_id = (SELECT id FROM categories WHERE name = 'Транспорт'))),
 
 -- Транспорт → Мотоциклы и скутеры
 (45, 'Красный скутер', 'Продаю скутер, 50 кубов, 2022 года. Отличное состояние, мало ездил.', 4,
@@ -303,6 +316,13 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 -- Хобби и досуг → Коллекционирование
 (66, 'Монеты СССР 1991–1993', 'Редкие монеты последних лет СССР и начала РФ. В кейсе.', 5,
  (SELECT id FROM subcategories WHERE name = 'Коллекционирование' AND category_id = (SELECT id FROM categories WHERE name = 'Хобби и досуг'))),
+
+-- Хобби и досуг → Спорт и активный отдых
+(125, 'Отдам детский велосипед', 'Отдам бесплатно детский велосипед, потому что для ребенка стал маленьким.', 4,
+ (SELECT id FROM subcategories WHERE name = 'Спорт и активный отдых' AND category_id = (SELECT id FROM categories WHERE name = 'Хобби и досуг'))),
+-- Хобби и досуг → Спорт и активный отдых
+(126, 'Обменяю на шоколадку теннисные ракетки', 'Обменяю на шоколадку теннисные ракетки. Например, на Aplen Gold.', 5,
+ (SELECT id FROM subcategories WHERE name = 'Спорт и активный отдых' AND category_id = (SELECT id FROM categories WHERE name = 'Хобби и досуг'))),
 
 -- Бизнес → Продажа бизнеса
 (67, 'Автомойка — готовый бизнес', 'Работающая автомойка в спальном районе. Оборудование новое, клиентская база есть.', 6,
@@ -402,6 +422,8 @@ INSERT INTO ad_images (ad_id, file_path, order_index) VALUES
 (64, 'games_monopoly.jpg', 1),
 (65, 'collectible_coins_1730-1754.jpg', 1),
 (66, 'collectible_coins_Russia_1991_1992_1993.jpg', 1),
+(125, 'sport_bicycle.jpeg', 1),
+(126, 'sports_tennis_rackets.webp', 1),
 
 -- Бизнес
 (67, 'buisness_car_wash_sold.webp', 1),
@@ -554,3 +576,10 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 -- Прочее → Другое
 (122, 'Помогу с переездом', 'Упаковка, перевозка, расстановка. Недорого.', 2,
  (SELECT id FROM subcat WHERE name = 'Другое' AND category_name = 'Прочее'));
+
+ -- обновляет sequence для ads: следующий nextval будет MAX(id)+1
+SELECT setval(pg_get_serial_sequence('ads', 'id'), (SELECT COALESCE(MAX(id), 0) FROM ads), true);
+
+-- при желании проделать для других таблиц тоже:
+SELECT setval(pg_get_serial_sequence('ad_images', 'id'), (SELECT COALESCE(MAX(id), 0) FROM ad_images), true);
+SELECT setval(pg_get_serial_sequence('users', 'id'), (SELECT COALESCE(MAX(id), 0) FROM users), true);

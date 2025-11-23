@@ -28,15 +28,20 @@ func NewApp(cfg *config.Config) *App {
 }
 
 func (a *App) InitDB() error {
+	log.Printf("Attempting to connect to database with config: host=%s port=%d user=%s dbname=%s",
+		a.cfg.DBHost, a.cfg.DBPort, a.cfg.DBUser, a.cfg.DBName)
+
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		a.cfg.DBHost, a.cfg.DBPort, a.cfg.DBUser, a.cfg.DBPassword, a.cfg.DBName)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
+		log.Printf("Failed to connect to database: %v", err)
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	a.db = db
+	log.Println("Successfully connected to database")
 	return nil
 }
 
