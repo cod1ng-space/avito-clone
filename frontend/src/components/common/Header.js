@@ -28,7 +28,7 @@ const Header = () => {
           {currentUser && (
             <Nav className="me-3">
               <LinkContainer to="/create-ad">
-                <Button variant="success" size="sm" className="me-2">
+                <Button variant="primary" size="sm" className="me-2">
                   Создать объявление
                 </Button>
               </LinkContainer>
