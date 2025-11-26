@@ -78,6 +78,15 @@ func (s *Service) UpdateUserProfile(userID uint, updateData *models.UserUpdateRe
 		return errors.New("user not found")
 	}
 
+	// Проверка на уникальность email, если он обновляется
+	if updateData.Email != "" && updateData.Email != user.Email {
+		existingUser, err := s.repo.GetUserByEmail(updateData.Email)
+		if err == nil && existingUser != nil && existingUser.ID != userID {
+			return errors.New("user with this email already exists")
+		}
+		user.Email = updateData.Email
+	}
+
 	if updateData.Username != "" {
 		user.Username = updateData.Username
 	}

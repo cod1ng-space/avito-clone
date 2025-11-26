@@ -75,6 +75,7 @@ type AdUpdateRequest struct {
 }
 
 type UserUpdateRequest struct {
+	Email         string  `json:"email" validate:"omitempty,email"`
 	Username      string  `json:"username" validate:"omitempty,min=3,max=100"`
 	Phone         string  `json:"phone" validate:"omitempty,phone"`
 	SocialNetwork *string `json:"social_network" validate:"omitempty"`

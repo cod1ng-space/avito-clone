@@ -5,17 +5,20 @@ import { authService } from '../../services/auth';
 import ErrorAlert from '../ui/ErrorAlert';
 
 const ProfileForm = ({ onSuccess }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, updateUserEmail } = useAuth();
+  const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
   const [socialNetwork, setSocialNetwork] = useState('');
   const [socialContact, setSocialContact] = useState('');
   const [error, setError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
+      setEmail(currentUser.email || '');
       setUsername(currentUser.username || '');
       setPhone(currentUser.phone || '');
       setSocialNetwork(currentUser.social_network || '');
@@ -27,6 +30,23 @@ const ProfileForm = ({ onSuccess }) => {
   const validatePhone = (phoneNumber) => {
     const phoneRegex = /^(\+7|8)?[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
     return phoneRegex.test(phoneNumber);
+  };
+
+  // Валидация email
+  const validateEmail = (emailValue) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(emailValue);
+  };
+
+  const handleEmailChange = (e) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+    
+    if (emailValue && !validateEmail(emailValue)) {
+      setEmailError('Неверный формат email');
+    } else {
+      setEmailError('');
+    }
   };
 
   const handlePhoneChange = (e) => {
@@ -43,6 +63,11 @@ const ProfileForm = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (email && !validateEmail(email)) {
+      setError('Введите корректный email');
+      return;
+    }
+
     if (phone && !validatePhone(phone)) {
       setError('Введите корректный номер телефона');
       return;
@@ -53,11 +78,17 @@ const ProfileForm = ({ onSuccess }) => {
       setLoading(true);
       
       await authService.updateProfile({
+        email,
         username,
         phone,
         social_network: socialNetwork,
         social_contact: socialContact
       });
+      
+      // Обновляем email в контексте, если он изменился
+      if (email !== currentUser.email) {
+        updateUserEmail(email);
+      }
       
       if (onSuccess) onSuccess();
     } catch (error) {
@@ -70,6 +101,21 @@ const ProfileForm = ({ onSuccess }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <ErrorAlert error={error} onClose={() => setError('')} id="profile-form-error" />
+      
+      <Form.Group className="mb-3" controlId="email">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          value={email}
+          onChange={handleEmailChange}
+          placeholder="example@mail.com"
+          required
+          isInvalid={!!emailError}
+        />
+        <Form.Control.Feedback type="invalid">
+          {emailError}
+        </Form.Control.Feedback>
+      </Form.Group>
       
       <Form.Group className="mb-3" controlId="username">
         <Form.Label>Имя пользователя</Form.Label>
@@ -119,11 +165,11 @@ const ProfileForm = ({ onSuccess }) => {
           type="text"
           value={socialContact}
           onChange={(e) => setSocialContact(e.target.value)}
-          placeholder="Имя пользователя или номер телефона"
+          placeholder="Имя пользователя"
         />
       </Form.Group>
       
-      <Button disabled={loading || !!phoneError} type="submit">
+      <Button disabled={loading || !!phoneError || !!emailError} type="submit">
         Обновить профиль
       </Button>
     </Form>
