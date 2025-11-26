@@ -3,18 +3,18 @@ package handlers
 import (
 	"net/http"
 
+	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
 	"adboard/internal/models"
-	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type UserHandler struct {
-	service *service.Service
+	service interfaces.Service
 }
 
-func NewUserHandler(service *service.Service) *UserHandler {
+func NewUserHandler(service interfaces.Service) interfaces.UserHandler {
 	return &UserHandler{service: service}
 }
 

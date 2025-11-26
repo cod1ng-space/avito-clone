@@ -6,19 +6,19 @@ import (
 	"time"
 
 	"adboard/internal/config"
+	"adboard/internal/interfaces"
 	"adboard/internal/models"
-	"adboard/internal/repository"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	repo *repository.Repository
+	repo interfaces.Repository
 	cfg  *config.Config
 }
 
-func NewService(repo *repository.Repository, cfg *config.Config) *Service {
+func NewService(repo interfaces.Repository, cfg *config.Config) interfaces.Service {
 	return &Service{repo: repo, cfg: cfg}
 }
 

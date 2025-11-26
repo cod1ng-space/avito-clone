@@ -1,0 +1,330 @@
+@startuml
+namespace app {
+    class "App" << (S,Aquamarine) >> {
+        - cfg *config.Config
+        - echo *echo.Echo
+        - db *gorm.DB
+
+        - checkCategoriesExist() error
+
+        + InitDB() error
+        + InitializeData() error
+        + InitEcho() 
+        + RegisterRoutes() 
+        + Start() error
+        + SetupValidator() 
+
+    }
+    class "CustomValidator" << (S,Aquamarine) >> {
+        - validator *validator.Validate
+
+        + Validate(i <font color=blue>interface</font>{}) error
+
+    }
+}
+namespace config {
+    class "Config" << (S,Aquamarine) >> {
+        + DBHost string
+        + DBPort int
+        + DBUser string
+        + DBPassword string
+        + DBName string
+        + JWTSecret string
+        + UploadDir string
+        + ServerPort string
+
+    }
+}
+namespace handlers {
+    class "AuthHandler" << (S,Aquamarine) >> {
+        - service interfaces.Service
+
+        + Register(c echo.Context) error
+        + Login(c echo.Context) error
+
+    }
+    class "CategoryHandler" << (S,Aquamarine) >> {
+        - service interfaces.Service
+
+        + GetCategories(c echo.Context) error
+
+    }
+    class "ImageHandler" << (S,Aquamarine) >> {
+        - service interfaces.Service
+
+        + AddImages(c echo.Context) error
+        + DeleteImage(c echo.Context) error
+
+    }
+    class "ItemHandler" << (S,Aquamarine) >> {
+        - service interfaces.Service
+
+        + CreateAd(c echo.Context) error
+        + CreateAdWithImages(c echo.Context) error
+        + GetAd(c echo.Context) error
+        + GetUserAds(c echo.Context) error
+        + SearchAds(c echo.Context) error
+        + UpdateAd(c echo.Context) error
+        + DeleteAd(c echo.Context) error
+
+    }
+    class "UserHandler" << (S,Aquamarine) >> {
+        - service interfaces.Service
+
+        + GetProfile(c echo.Context) error
+        + UpdateProfile(c echo.Context) error
+
+    }
+}
+namespace interfaces {
+    interface "AuthHandler"  {
+        + Register(c echo.Context) error
+        + Login(c echo.Context) error
+
+    }
+    interface "CategoryHandler"  {
+        + GetCategories(c echo.Context) error
+
+    }
+    interface "ImageHandler"  {
+        + AddImages(c echo.Context) error
+        + DeleteImage(c echo.Context) error
+
+    }
+    interface "ItemHandler"  {
+        + CreateAd(c echo.Context) error
+        + CreateAdWithImages(c echo.Context) error
+        + GetAd(c echo.Context) error
+        + GetUserAds(c echo.Context) error
+        + SearchAds(c echo.Context) error
+        + UpdateAd(c echo.Context) error
+        + DeleteAd(c echo.Context) error
+
+    }
+    interface "Repository"  {
+        + CreateUser(user *models.User) error
+        + GetUserByEmail(email string) (*models.User, error)
+        + GetUserByID(id uint) (*models.User, error)
+        + UpdateUser(user *models.User) error
+        + GetCategories() ([]models.Category, error)
+        + CreateAd(ad *models.Ad) error
+        + GetAdByID(id uint) (*models.Ad, error)
+        + GetUserAds(userID uint, page int, limit int) ([]models.Ad, int64, error)
+        + SearchAds(query string, categoryID uint, subcategoryID uint, page int, limit int) ([]models.Ad, int64, error)
+        + UpdateAd(ad *models.Ad) error
+        + DeleteAd(id uint) error
+        + AddAdImages(images []models.AdImage) error
+        + GetAdImageCount(adID uint) (int64, error)
+        + DeleteAdImage(id uint) error
+        + GetAdImageByID(id uint) (*models.AdImage, error)
+        + CreateAdWithImages(ad *models.Ad, imagePaths []string) error
+
+    }
+    interface "Service"  {
+        + RegisterUser(user *models.User) error
+        + LoginUser(email string, password string) (string, error)
+        + GetUserProfile(userID uint) (*models.User, error)
+        + UpdateUserProfile(userID uint, updateData *models.UserUpdateRequest) error
+        + GetCategories() ([]models.Category, error)
+        + CreateAd(ad *models.Ad) error
+        + GetAdByID(id uint) (*models.Ad, error)
+        + GetUserAds(userID uint, page int, limit int) ([]models.Ad, int64, error)
+        + SearchAds(query string, categoryID uint, subcategoryID uint, page int, limit int) ([]models.Ad, int64, error)
+        + UpdateAd(adID uint, userID uint, updateData *models.AdUpdateRequest) error
+        + DeleteAd(adID uint, userID uint) error
+        + AddAdImages(adID uint, userID uint, imagePaths []string) error
+        + DeleteAdImage(imageID uint, userID uint) error
+        + CreateAdWithImages(ad *models.Ad, imagePaths []string) error
+
+    }
+    interface "UserHandler"  {
+        + GetProfile(c echo.Context) error
+        + UpdateProfile(c echo.Context) error
+
+    }
+}
+namespace middleware {
+}
+namespace models {
+    class "Ad" << (S,Aquamarine) >> {
+        + ID uint
+        + Title string
+        + Description string
+        + UserID uint
+        + User User
+        + SubcategoryID uint
+        + Subcategory Subcategory
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+        + Images []AdImage
+
+    }
+    class "AdCreateRequest" << (S,Aquamarine) >> {
+        + Title string
+        + Description string
+        + SubcategoryID uint
+
+    }
+    class "AdImage" << (S,Aquamarine) >> {
+        + ID uint
+        + AdID uint
+        + FilePath string
+        + OrderIndex int
+
+    }
+    class "AdUpdateRequest" << (S,Aquamarine) >> {
+        + Title string
+        + Description string
+        + SubcategoryID uint
+
+    }
+    class "AuthRequest" << (S,Aquamarine) >> {
+        + Email string
+        + Password string
+
+    }
+    class "Category" << (S,Aquamarine) >> {
+        + ID uint
+        + Name string
+        + Subcategories []Subcategory
+
+    }
+    class "RegisterRequest" << (S,Aquamarine) >> {
+        + Email string
+        + Password string
+        + Username string
+        + Phone string
+
+    }
+    class "SearchParams" << (S,Aquamarine) >> {
+        + Query string
+        + Page int
+        + Limit int
+        + Category string
+        + Subcategory string
+
+    }
+    class "Subcategory" << (S,Aquamarine) >> {
+        + ID uint
+        + Name string
+        + CategoryID uint
+        + Category Category
+
+    }
+    class "User" << (S,Aquamarine) >> {
+        + ID uint
+        + Email string
+        + Username string
+        + Phone string
+        + SocialNetwork *string
+        + SocialContact *string
+        + PasswordHash string
+        + CreatedAt time.Time
+        + UpdatedAt time.Time
+        + Ads []Ad
+
+    }
+    class "UserUpdateRequest" << (S,Aquamarine) >> {
+        + Username string
+        + Phone string
+        + SocialNetwork *string
+        + SocialContact *string
+
+    }
+}
+namespace repository {
+    class "Repository" << (S,Aquamarine) >> {
+        - db *gorm.DB
+
+        + CreateUser(user *models.User) error
+        + GetUserByEmail(email string) (*models.User, error)
+        + GetUserByID(id uint) (*models.User, error)
+        + UpdateUser(user *models.User) error
+        + GetCategories() ([]models.Category, error)
+        + CreateAd(ad *models.Ad) error
+        + GetAdByID(id uint) (*models.Ad, error)
+        + GetUserAds(userID uint, page int, limit int) ([]models.Ad, int64, error)
+        + SearchAds(query string, categoryID uint, subcategoryID uint, page int, limit int) ([]models.Ad, int64, error)
+        + UpdateAd(ad *models.Ad) error
+        + DeleteAd(id uint) error
+        + AddAdImages(images []models.AdImage) error
+        + GetAdImageCount(adID uint) (int64, error)
+        + DeleteAdImage(id uint) error
+        + GetAdImageByID(id uint) (*models.AdImage, error)
+        + CreateAdWithImages(ad *models.Ad, imagePaths []string) error
+
+    }
+}
+namespace service {
+    class "Service" << (S,Aquamarine) >> {
+        - repo interfaces.Repository
+        - cfg *config.Config
+
+        + RegisterUser(user *models.User) error
+        + LoginUser(email string, password string) (string, error)
+        + GetUserProfile(userID uint) (*models.User, error)
+        + UpdateUserProfile(userID uint, updateData *models.UserUpdateRequest) error
+        + GetCategories() ([]models.Category, error)
+        + CreateAd(ad *models.Ad) error
+        + GetAdByID(id uint) (*models.Ad, error)
+        + GetUserAds(userID uint, page int, limit int) ([]models.Ad, int64, error)
+        + SearchAds(query string, categoryID uint, subcategoryID uint, page int, limit int) ([]models.Ad, int64, error)
+        + UpdateAd(adID uint, userID uint, updateData *models.AdUpdateRequest) error
+        + DeleteAd(adID uint, userID uint) error
+        + AddAdImages(adID uint, userID uint, imagePaths []string) error
+        + DeleteAdImage(imageID uint, userID uint) error
+        + CreateAdWithImages(ad *models.Ad, imagePaths []string) error
+
+    }
+}
+namespace cmd {
+    namespace server {
+    }
+}
+
+' === ДОБАВЬТЕ ЭТИ СВЯЗИ ===
+
+' Зависимости App
+App --> config.Config
+App --> repository.Repository
+App --> service.Service
+
+' Сервисный слой
+service.Service --> interfaces.Repository
+service.Service --> config.Config
+
+' Репозиторий
+repository.Repository ..|> interfaces.Repository
+
+' Обработчики
+AuthHandler --> interfaces.Service
+UserHandler --> interfaces.Service
+CategoryHandler --> interfaces.Service
+ItemHandler --> interfaces.Service
+ImageHandler --> interfaces.Service
+
+' Реализации интерфейсов
+AuthHandler ..|> interfaces.AuthHandler
+UserHandler ..|> interfaces.UserHandler
+CategoryHandler ..|> interfaces.CategoryHandler
+ItemHandler ..|> interfaces.ItemHandler
+ImageHandler ..|> interfaces.ImageHandler
+service.Service ..|> interfaces.Service
+repository.Repository ..|> interfaces.Repository
+
+' Модели отношений
+Ad --> User
+Ad --> Subcategory
+Ad --> AdImage
+Category --> Subcategory
+User --> Ad
+
+' Запросы/ответы
+AuthHandler --> models.AuthRequest
+AuthHandler --> models.RegisterRequest
+UserHandler --> models.UserUpdateRequest
+ItemHandler --> models.AdCreateRequest
+ItemHandler --> models.AdUpdateRequest
+ItemHandler --> models.SearchParams
+
+@enduml
