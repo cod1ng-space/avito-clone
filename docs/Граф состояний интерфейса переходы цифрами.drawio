@@ -4,28 +4,28 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-1" value="S1" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-1" value="Главная страница" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="344" y="440" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-2" value="S4" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-2" value="Авторизация" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="70" y="630" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-3" value="S3" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-3" value="Регистрация" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="344" y="630" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-4" value="S2" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-4" value="Страница объявления" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="620" y="630" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-5" value="S6" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-5" value="Мои объявления" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="70" y="250" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-6" value="S5" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-6" value="Создать объявление" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="344" y="250" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-7" value="S7" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-7" value="Редактирование объявление" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="70" y="440" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-8" value="S8" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-8" value="Редактирование профиля" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="620" y="250" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="cTcmCgI96I2mh8rcXZx2-11" value="" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0.317;exitY=0.999;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="cTcmCgI96I2mh8rcXZx2-1" target="cTcmCgI96I2mh8rcXZx2-2" edge="1">
@@ -135,9 +135,9 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="cTcmCgI96I2mh8rcXZx2-30" value="Успешное &lt;br&gt;редактирование" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="cTcmCgI96I2mh8rcXZx2-29" vertex="1" connectable="0">
+        <mxCell id="cTcmCgI96I2mh8rcXZx2-30" value="17" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=14;" parent="cTcmCgI96I2mh8rcXZx2-29" vertex="1" connectable="0">
           <mxGeometry x="-0.0108" y="13" relative="1" as="geometry">
-            <mxPoint x="-5" y="31" as="offset" />
+            <mxPoint x="-5" y="21" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="cTcmCgI96I2mh8rcXZx2-31" value="" style="curved=1;endArrow=classic;html=1;rounded=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" parent="1" source="cTcmCgI96I2mh8rcXZx2-5" target="cTcmCgI96I2mh8rcXZx2-1" edge="1">
