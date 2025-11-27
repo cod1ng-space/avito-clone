@@ -11,19 +11,17 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ItemHandler struct {
-	adService       *service.AdService
-	categoryService *service.CategoryService
+type AdHandler struct {
+	adService *service.AdService
 }
 
-func NewItemHandler(adService *service.AdService, categoryService *service.CategoryService) *ItemHandler {
-	return &ItemHandler{
-		adService:       adService,
-		categoryService: categoryService,
+func NewAdHandler(adService *service.AdService) *AdHandler {
+	return &AdHandler{
+		adService: adService,
 	}
 }
 
-func (h *ItemHandler) CreateAd(c echo.Context) error {
+func (h *AdHandler) CreateAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	var req models.AdCreateRequest
@@ -53,7 +51,7 @@ func (h *ItemHandler) CreateAd(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ad)
 }
 
-func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
+func (h *AdHandler) CreateAdWithImages(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	// Получаем данные объявления из form-data
@@ -113,7 +111,7 @@ func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ad)
 }
 
-func (h *ItemHandler) GetAd(c echo.Context) error {
+func (h *AdHandler) GetAd(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
@@ -133,7 +131,7 @@ func (h *ItemHandler) GetAd(c echo.Context) error {
 	return c.JSON(http.StatusOK, ad)
 }
 
-func (h *ItemHandler) GetUserAds(c echo.Context) error {
+func (h *AdHandler) GetUserAds(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -159,7 +157,7 @@ func (h *ItemHandler) GetUserAds(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) SearchAds(c echo.Context) error {
+func (h *AdHandler) SearchAds(c echo.Context) error {
 	query := c.QueryParam("q")
 	categoryStr := c.QueryParam("category")
 	subcategoryStr := c.QueryParam("subcategory")
@@ -204,7 +202,7 @@ func (h *ItemHandler) SearchAds(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) UpdateAd(c echo.Context) error {
+func (h *AdHandler) UpdateAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -230,7 +228,7 @@ func (h *ItemHandler) UpdateAd(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) DeleteAd(c echo.Context) error {
+func (h *AdHandler) DeleteAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	id, err := strconv.Atoi(c.Param("id"))

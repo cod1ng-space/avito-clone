@@ -12,13 +12,11 @@ import (
 
 type ImageHandler struct {
 	imageService *service.ImageService
-	adService    *service.AdService
 }
 
-func NewImageHandler(imageService *service.ImageService, adService *service.AdService) *ImageHandler {
+func NewImageHandler(imageService *service.ImageService) *ImageHandler {
 	return &ImageHandler{
 		imageService: imageService,
-		adService:    adService,
 	}
 }
 

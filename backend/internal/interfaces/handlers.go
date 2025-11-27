@@ -16,7 +16,7 @@ type CategoryHandler interface {
 	GetCategories(c echo.Context) error
 }
 
-type ItemHandler interface {
+type AdHandler interface {
 	CreateAd(c echo.Context) error
 	CreateAdWithImages(c echo.Context) error
 	GetAd(c echo.Context) error

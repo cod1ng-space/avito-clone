@@ -85,15 +85,15 @@ func (a *App) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
-	itemHandler := handlers.NewItemHandler(adService, categoryService)
-	imageHandler := handlers.NewImageHandler(imageService, adService)
+	adHandler := handlers.NewAdHandler(adService)
+	imageHandler := handlers.NewImageHandler(imageService)
 
 	// Public routes
 	a.echo.POST("/register", authHandler.Register)
 	a.echo.POST("/login", authHandler.Login)
 	a.echo.GET("/categories", categoryHandler.GetCategories)
-	a.echo.GET("/ads", itemHandler.SearchAds)
-	a.echo.GET("/ads/:id", itemHandler.GetAd)
+	a.echo.GET("/ads", adHandler.SearchAds)
+	a.echo.GET("/ads/:id", adHandler.GetAd)
 
 	// Protected routes
 	protected := a.echo.Group("")
@@ -102,11 +102,11 @@ func (a *App) RegisterRoutes() {
 	protected.GET("/profile", userHandler.GetProfile)
 	protected.PUT("/profile", userHandler.UpdateProfile)
 
-	protected.POST("/ads", itemHandler.CreateAd)
-	protected.POST("/ads/with-images", itemHandler.CreateAdWithImages, middleware.UploadFiles)
-	protected.GET("/my-ads", itemHandler.GetUserAds)
-	protected.PUT("/ads/:id", itemHandler.UpdateAd)
-	protected.DELETE("/ads/:id", itemHandler.DeleteAd)
+	protected.POST("/ads", adHandler.CreateAd)
+	protected.POST("/ads/with-images", adHandler.CreateAdWithImages, middleware.UploadFiles)
+	protected.GET("/my-ads", adHandler.GetUserAds)
+	protected.PUT("/ads/:id", adHandler.UpdateAd)
+	protected.DELETE("/ads/:id", adHandler.DeleteAd)
 
 	// Image routes with upload middleware
 	protected.POST("/ads/:id/images", imageHandler.AddImages, middleware.UploadFiles)
