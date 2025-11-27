@@ -3,21 +3,21 @@ package handlers
 import (
 	"net/http"
 
-	"adboard/internal/interfaces"
+	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type CategoryHandler struct {
-	service interfaces.Service
+	categoryService *service.CategoryService
 }
 
-func NewCategoryHandler(service interfaces.Service) interfaces.CategoryHandler {
-	return &CategoryHandler{service: service}
+func NewCategoryHandler(categoryService *service.CategoryService) *CategoryHandler {
+	return &CategoryHandler{categoryService: categoryService}
 }
 
 func (h *CategoryHandler) GetCategories(c echo.Context) error {
-	categories, err := h.service.GetCategories()
+	categories, err := h.categoryService.GetCategories()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

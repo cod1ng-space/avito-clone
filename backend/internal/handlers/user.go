@@ -3,25 +3,25 @@ package handlers
 import (
 	"net/http"
 
-	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
 	"adboard/internal/models"
+	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type UserHandler struct {
-	service interfaces.Service
+	userService *service.UserService
 }
 
-func NewUserHandler(service interfaces.Service) interfaces.UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(userService *service.UserService) *UserHandler {
+	return &UserHandler{userService: userService}
 }
 
 func (h *UserHandler) GetProfile(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
-	user, err := h.service.GetUserProfile(userID)
+	user, err := h.userService.GetUserProfile(userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
@@ -41,7 +41,7 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.UpdateUserProfile(userID, &req); err != nil {
+	if err := h.userService.UpdateUserProfile(userID, &req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 

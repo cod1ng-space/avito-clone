@@ -67,15 +67,26 @@ func (a *App) InitEcho() {
 }
 
 func (a *App) RegisterRoutes() {
-	// Initialize repositories, services, and handlers
-	repo := repository.NewRepository(a.db)
-	svc := service.NewService(repo, a.cfg)
+	// Initialize repositories
+	authRepo := repository.NewAuthRepository(a.db)
+	userRepo := repository.NewUserRepository(a.db)
+	categoryRepo := repository.NewCategoryRepository(a.db)
+	adRepo := repository.NewAdRepository(a.db)
+	imageRepo := repository.NewImageRepository(a.db)
 
-	authHandler := handlers.NewAuthHandler(svc)
-	userHandler := handlers.NewUserHandler(svc)
-	categoryHandler := handlers.NewCategoryHandler(svc)
-	itemHandler := handlers.NewItemHandler(svc)
-	imageHandler := handlers.NewImageHandler(svc)
+	// Initialize services
+	authService := service.NewAuthService(authRepo, a.cfg)
+	userService := service.NewUserService(userRepo, authRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
+	adService := service.NewAdService(adRepo)
+	imageService := service.NewImageService(imageRepo, adRepo)
+
+	// Initialize handlers
+	authHandler := handlers.NewAuthHandler(authService)
+	userHandler := handlers.NewUserHandler(userService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	itemHandler := handlers.NewItemHandler(adService, categoryService)
+	imageHandler := handlers.NewImageHandler(imageService, adService)
 
 	// Public routes
 	a.echo.POST("/register", authHandler.Register)

@@ -63,6 +63,19 @@ const ProfileForm = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Проверка на отсутствие изменений
+    const hasChanges =
+      email !== currentUser.email ||
+      username !== currentUser.username ||
+      phone !== currentUser.phone ||
+      socialNetwork !== currentUser.social_network ||
+      socialContact !== currentUser.social_contact;
+
+    if (!hasChanges) {
+      setError('Нет изменений для сохранения');
+      return;
+    }
+
     if (email && !validateEmail(email)) {
       setError('Введите корректный email');
       return;

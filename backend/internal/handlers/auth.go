@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"adboard/internal/interfaces"
 	"adboard/internal/models"
+	"adboard/internal/service"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 )
 
 type AuthHandler struct {
-	service interfaces.Service
+	authService *service.AuthService
 }
 
-func NewAuthHandler(service interfaces.Service) interfaces.AuthHandler {
-	return &AuthHandler{service: service}
+func NewAuthHandler(authService *service.AuthService) *AuthHandler {
+	return &AuthHandler{authService: authService}
 }
 
 func (h *AuthHandler) Register(c echo.Context) error {
@@ -51,7 +51,7 @@ func (h *AuthHandler) Register(c echo.Context) error {
 		Phone:        req.Phone,
 	}
 
-	if err := h.service.RegisterUser(user); err != nil {
+	if err := h.authService.RegisterUser(user); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -70,7 +70,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	token, err := h.service.LoginUser(req.Email, req.Password)
+	token, err := h.authService.LoginUser(req.Email, req.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
