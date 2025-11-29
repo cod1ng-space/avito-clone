@@ -12,9 +12,31 @@ const LoginForm = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+  // Валидация email
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+    
+    // Проверяем валидность email при вводе
+    if (emailValue && !validateEmail(emailValue)) {
+      setError('Неверный формат электронной почты');
+    } else {
+      setError('');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Проверка валидности email перед отправкой
+    if (!validateEmail(email)) {
+      return setError('Введите корректный адрес электронной почты');
+    }
     
     try {
       setError('');
@@ -44,7 +66,7 @@ const LoginForm = () => {
             <Form.Control
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
             />
           </Form.Group>

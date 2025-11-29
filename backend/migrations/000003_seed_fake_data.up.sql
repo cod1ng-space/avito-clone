@@ -98,7 +98,7 @@ INSERT INTO ads (id, title, description, user_id, subcategory_id) VALUES
 (123, 'Продам холодильник', 'Продам холодильник отличном состоянии. Использовался менее года. ', 3,
  (SELECT id FROM subcategories WHERE name = 'Бытовая техника' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
 -- Техника и электроника → Бытовая техника
-(124, 'Стиральная мащина', 'Продам стиральную машину. Цена 5000 рублей.', 4,
+(124, 'Стиральная машина', 'Продам стиральную машину. Цена 5000 рублей.', 4,
  (SELECT id FROM subcategories WHERE name = 'Бытовая техника' AND category_id = (SELECT id FROM categories WHERE name = 'Техника и электроника'))),
 
 -- Мода и стиль → Аксессуары
