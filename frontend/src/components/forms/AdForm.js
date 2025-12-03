@@ -27,6 +27,19 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Проверка на отсутствие изменений
+    if (initialData) {
+      const hasChanges =
+        title !== initialData.title ||
+        description !== initialData.description ||
+        subcategoryId !== String(initialData.subcategory_id) ||
+        newImages.length > 0;
+
+      if (!hasChanges) {
+        return setError('Нет изменений для сохранения');
+      }
+    }
+
     if (!title || !description || !subcategoryId) {
       return setError('Пожалуйста, заполните все обязательные поля');
     }

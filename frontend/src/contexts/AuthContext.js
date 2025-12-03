@@ -77,11 +77,18 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
   };
 
+  const updateUserEmail = (newEmail) => {
+    if (currentUser) {
+      setCurrentUser({ ...currentUser, email: newEmail });
+    }
+  };
+
   const value = {
     currentUser,
     login,
     register,
     logout,
+    updateUserEmail,
     loading
   };
 

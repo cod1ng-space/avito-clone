@@ -4,18 +4,20 @@ import (
 	"net/http"
 	"strconv"
 
-	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
+	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
 type ImageHandler struct {
-	service interfaces.Service
+	imageService *service.ImageService
 }
 
-func NewImageHandler(service interfaces.Service) interfaces.ImageHandler {
-	return &ImageHandler{service: service}
+func NewImageHandler(imageService *service.ImageService) *ImageHandler {
+	return &ImageHandler{
+		imageService: imageService,
+	}
 }
 
 func (h *ImageHandler) AddImages(c echo.Context) error {
@@ -31,7 +33,7 @@ func (h *ImageHandler) AddImages(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "No files uploaded")
 	}
 
-	if err := h.service.AddAdImages(uint(adID), userID, uploadedFiles); err != nil {
+	if err := h.imageService.AddAdImages(uint(adID), userID, uploadedFiles); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -48,7 +50,7 @@ func (h *ImageHandler) DeleteImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid image ID")
 	}
 
-	if err := h.service.DeleteAdImage(uint(imageID), userID); err != nil {
+	if err := h.imageService.DeleteAdImage(uint(imageID), userID); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 

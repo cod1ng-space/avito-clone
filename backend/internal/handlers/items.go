@@ -4,22 +4,24 @@ import (
 	"net/http"
 	"strconv"
 
-	"adboard/internal/interfaces"
 	"adboard/internal/middleware"
 	"adboard/internal/models"
+	"adboard/internal/service"
 
 	"github.com/labstack/echo/v4"
 )
 
-type ItemHandler struct {
-	service interfaces.Service
+type AdHandler struct {
+	adService *service.AdService
 }
 
-func NewItemHandler(service interfaces.Service) interfaces.ItemHandler {
-	return &ItemHandler{service: service}
+func NewAdHandler(adService *service.AdService) *AdHandler {
+	return &AdHandler{
+		adService: adService,
+	}
 }
 
-func (h *ItemHandler) CreateAd(c echo.Context) error {
+func (h *AdHandler) CreateAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	var req models.AdCreateRequest
@@ -42,14 +44,14 @@ func (h *ItemHandler) CreateAd(c echo.Context) error {
 		SubcategoryID: req.SubcategoryID,
 	}
 
-	if err := h.service.CreateAd(ad); err != nil {
+	if err := h.adService.CreateAd(ad); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, ad)
 }
 
-func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
+func (h *AdHandler) CreateAdWithImages(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	// Получаем данные объявления из form-data
@@ -99,7 +101,7 @@ func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
 	uploadedFiles, _ := c.Get("uploadedFiles").([]string)
 
 	// Создаем объявление и добавляем изображения в одной транзакции
-	if err := h.service.CreateAdWithImages(ad, uploadedFiles); err != nil {
+	if err := h.adService.CreateAdWithImages(ad, uploadedFiles); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
 			"message": "Ошибка создания объявления",
 			"error":   err.Error(),
@@ -109,7 +111,7 @@ func (h *ItemHandler) CreateAdWithImages(c echo.Context) error {
 	return c.JSON(http.StatusCreated, ad)
 }
 
-func (h *ItemHandler) GetAd(c echo.Context) error {
+func (h *AdHandler) GetAd(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{
@@ -118,7 +120,7 @@ func (h *ItemHandler) GetAd(c echo.Context) error {
 		})
 	}
 
-	ad, err := h.service.GetAdByID(uint(id))
+	ad, err := h.adService.GetAdByID(uint(id))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, map[string]string{
 			"message": "Объявление не найдено",
@@ -129,7 +131,7 @@ func (h *ItemHandler) GetAd(c echo.Context) error {
 	return c.JSON(http.StatusOK, ad)
 }
 
-func (h *ItemHandler) GetUserAds(c echo.Context) error {
+func (h *AdHandler) GetUserAds(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	page, _ := strconv.Atoi(c.QueryParam("page"))
@@ -142,7 +144,7 @@ func (h *ItemHandler) GetUserAds(c echo.Context) error {
 		limit = 12
 	}
 
-	ads, total, err := h.service.GetUserAds(userID, page, limit)
+	ads, total, err := h.adService.GetUserAds(userID, page, limit)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -155,7 +157,7 @@ func (h *ItemHandler) GetUserAds(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) SearchAds(c echo.Context) error {
+func (h *AdHandler) SearchAds(c echo.Context) error {
 	query := c.QueryParam("q")
 	categoryStr := c.QueryParam("category")
 	subcategoryStr := c.QueryParam("subcategory")
@@ -187,7 +189,7 @@ func (h *ItemHandler) SearchAds(c echo.Context) error {
 		subcategoryID = uint(subID)
 	}
 
-	ads, total, err := h.service.SearchAds(query, categoryID, subcategoryID, page, limit)
+	ads, total, err := h.adService.SearchAds(query, categoryID, subcategoryID, page, limit)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -200,7 +202,7 @@ func (h *ItemHandler) SearchAds(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) UpdateAd(c echo.Context) error {
+func (h *AdHandler) UpdateAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -217,7 +219,7 @@ func (h *ItemHandler) UpdateAd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.UpdateAd(uint(id), userID, &req); err != nil {
+	if err := h.adService.UpdateAd(uint(id), userID, &req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
@@ -226,7 +228,7 @@ func (h *ItemHandler) UpdateAd(c echo.Context) error {
 	})
 }
 
-func (h *ItemHandler) DeleteAd(c echo.Context) error {
+func (h *AdHandler) DeleteAd(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 
 	id, err := strconv.Atoi(c.Param("id"))
@@ -234,7 +236,7 @@ func (h *ItemHandler) DeleteAd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid ad ID")
 	}
 
-	if err := h.service.DeleteAd(uint(id), userID); err != nil {
+	if err := h.adService.DeleteAd(uint(id), userID); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 

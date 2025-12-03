@@ -17,6 +17,12 @@ const RegisterForm = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  // Валидация email
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   // Валидация номера телефона
   const validatePhone = (phoneNumber) => {
     const phoneRegex = /^(\+7|8)?[\s-]?\(?[0-9]{3}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
@@ -34,8 +40,25 @@ const RegisterForm = () => {
     }
   };
 
+  const handleEmailChange = (e) => {
+    const emailValue = e.target.value;
+    setEmail(emailValue);
+    
+    // Проверяем валидность email при вводе
+    if (emailValue && !validateEmail(emailValue)) {
+      setError('Неверный формат электронной почты');
+    } else {
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Проверка валидности email перед отправкой
+    if (!validateEmail(email)) {
+      return setError('Введите корректный адрес электронной почты');
+    }
     
     if (password.length < 6) {
       return setError('Пароль должен содержать не менее 6 символов');
@@ -77,7 +100,7 @@ const RegisterForm = () => {
             <Form.Control
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
             />
           </Form.Group>

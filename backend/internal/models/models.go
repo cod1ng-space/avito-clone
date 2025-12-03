@@ -63,18 +63,19 @@ type RegisterRequest struct {
 }
 
 type AdCreateRequest struct {
-	Title         string `json:"title" validate:"required,min=3,max=200"`
-	Description   string `json:"description" validate:"required,min=5"`
+	Title         string `json:"title" validate:"omitempty,min=3,max=100"`
+	Description   string `json:"description" validate:"required,min=20,max=5000"`
 	SubcategoryID uint   `json:"subcategory_id" validate:"required"`
 }
 
 type AdUpdateRequest struct {
-	Title         string `json:"title" validate:"omitempty,min=3,max=200"`
-	Description   string `json:"description" validate:"omitempty,min=5"`
+	Title         string `json:"title" validate:"omitempty,min=3,max=100"`
+	Description   string `json:"description" validate:"omitempty,min=20,max=5000"`
 	SubcategoryID uint   `json:"subcategory_id" validate:"omitempty"`
 }
 
 type UserUpdateRequest struct {
+	Email         string  `json:"email" validate:"omitempty,email"`
 	Username      string  `json:"username" validate:"omitempty,min=3,max=100"`
 	Phone         string  `json:"phone" validate:"omitempty,phone"`
 	SocialNetwork *string `json:"social_network" validate:"omitempty"`

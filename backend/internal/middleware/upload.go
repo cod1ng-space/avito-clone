@@ -31,12 +31,10 @@ func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {
 			uploadDir = "./uploads/images"
 		}
 
-		// Create upload directory if it doesn't exist
 		if err := os.MkdirAll(uploadDir, os.ModePerm); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create upload directory")
 		}
 
-		// Parse multipart form
 		if err := c.Request().ParseMultipartForm(maxUploadSize); err != nil {
 			return echo.NewHTTPError(http.StatusBadRequest, "File too large")
 		}
@@ -59,14 +57,12 @@ func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {
 		// Обрабатываем все найденные файлы
 		for _, files := range allFiles {
 			for _, fileHeader := range files {
-				// Open file
 				file, err := fileHeader.Open()
 				if err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to open file")
 				}
 				defer file.Close()
 
-				// Check MIME type
 				buffer := make([]byte, 512)
 				if _, err = file.Read(buffer); err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to read file")
@@ -80,22 +76,19 @@ func UploadFiles(next echo.HandlerFunc) echo.HandlerFunc {
 					return echo.NewHTTPError(http.StatusBadRequest, "Invalid file type: "+mimeType)
 				}
 
-				// Generate unique filename
 				ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
 				if ext == "" {
 					ext = "." + strings.Split(mimeType, "/")[1]
 				}
 				filename := generateUniqueFilename(ext)
 
-				// Create destination file
 				dstPath := filepath.Join(uploadDir, filename)
 				dst, err := os.Create(dstPath)
 				if err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create file")
 				}
 				defer dst.Close()
-
-				// Copy file content
+			
 				if _, err = io.Copy(dst, file); err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save file")
 				}

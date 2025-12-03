@@ -61,43 +61,47 @@ func (a *App) InitEcho() {
 	a.echo.Use(echomiddleware.Recover())
 	a.echo.Use(echomiddleware.CORS())
 
-	// Serve uploaded images
 	a.echo.Static("/images", a.cfg.UploadDir)
 	a.SetupValidator()
 }
 
 func (a *App) RegisterRoutes() {
-	// Initialize repositories, services, and handlers
-	repo := repository.NewRepository(a.db)
-	svc := service.NewService(repo, a.cfg)
+	authRepo := repository.NewAuthRepository(a.db)
+	userRepo := repository.NewUserRepository(a.db)
+	categoryRepo := repository.NewCategoryRepository(a.db)
+	adRepo := repository.NewAdRepository(a.db)
+	imageRepo := repository.NewImageRepository(a.db)
 
-	authHandler := handlers.NewAuthHandler(svc)
-	userHandler := handlers.NewUserHandler(svc)
-	categoryHandler := handlers.NewCategoryHandler(svc)
-	itemHandler := handlers.NewItemHandler(svc)
-	imageHandler := handlers.NewImageHandler(svc)
+	authService := service.NewAuthService(authRepo, a.cfg)
+	userService := service.NewUserService(userRepo, authRepo)
+	categoryService := service.NewCategoryService(categoryRepo)
+	adService := service.NewAdService(adRepo)
+	imageService := service.NewImageService(imageRepo, adRepo)
 
-	// Public routes
+	authHandler := handlers.NewAuthHandler(authService)
+	userHandler := handlers.NewUserHandler(userService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	adHandler := handlers.NewAdHandler(adService)
+	imageHandler := handlers.NewImageHandler(imageService)
+
 	a.echo.POST("/register", authHandler.Register)
 	a.echo.POST("/login", authHandler.Login)
 	a.echo.GET("/categories", categoryHandler.GetCategories)
-	a.echo.GET("/ads", itemHandler.SearchAds)
-	a.echo.GET("/ads/:id", itemHandler.GetAd)
+	a.echo.GET("/ads", adHandler.SearchAds)
+	a.echo.GET("/ads/:id", adHandler.GetAd)
 
-	// Protected routes
 	protected := a.echo.Group("")
 	protected.Use(middleware.JWTAuth(a.cfg))
 
 	protected.GET("/profile", userHandler.GetProfile)
 	protected.PUT("/profile", userHandler.UpdateProfile)
 
-	protected.POST("/ads", itemHandler.CreateAd)
-	protected.POST("/ads/with-images", itemHandler.CreateAdWithImages, middleware.UploadFiles)
-	protected.GET("/my-ads", itemHandler.GetUserAds)
-	protected.PUT("/ads/:id", itemHandler.UpdateAd)
-	protected.DELETE("/ads/:id", itemHandler.DeleteAd)
+	protected.POST("/ads", adHandler.CreateAd)
+	protected.POST("/ads/with-images", adHandler.CreateAdWithImages, middleware.UploadFiles)
+	protected.GET("/my-ads", adHandler.GetUserAds)
+	protected.PUT("/ads/:id", adHandler.UpdateAd)
+	protected.DELETE("/ads/:id", adHandler.DeleteAd)
 
-	// Image routes with upload middleware
 	protected.POST("/ads/:id/images", imageHandler.AddImages, middleware.UploadFiles)
 	protected.DELETE("/images/:imageId", imageHandler.DeleteImage)
 }

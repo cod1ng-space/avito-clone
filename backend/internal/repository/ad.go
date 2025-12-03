@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"strings"
 
 	"adboard/internal/interfaces"
@@ -10,55 +9,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository struct {
+type AdRepository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) interfaces.Repository {
-	return &Repository{db: db}
+func NewAdRepository(db *gorm.DB) interfaces.AdRepository {
+	return &AdRepository{db: db}
 }
 
-// User methods
-func (r *Repository) CreateUser(user *models.User) error {
-	return r.db.Create(user).Error
-}
-
-func (r *Repository) GetUserByEmail(email string) (*models.User, error) {
-	var user models.User
-	err := r.db.Where("email = ?", email).First(&user).Error
-	return &user, err
-}
-
-func (r *Repository) GetUserByID(id uint) (*models.User, error) {
-	var user models.User
-	err := r.db.First(&user, id).Error
-	return &user, err
-}
-
-func (r *Repository) UpdateUser(user *models.User) error {
-	return r.db.Save(user).Error
-}
-
-// Category methods
-func (r *Repository) GetCategories() ([]models.Category, error) {
-	var categories []models.Category
-	err := r.db.Preload("Subcategories").Find(&categories).Error
-	return categories, err
-}
-
-// Ad methods
-func (r *Repository) CreateAd(ad *models.Ad) error {
+func (r *AdRepository) CreateAd(ad *models.Ad) error {
 	return r.db.Create(ad).Error
 }
 
-func (r *Repository) GetAdByID(id uint) (*models.Ad, error) {
+func (r *AdRepository) GetAdByID(id uint) (*models.Ad, error) {
 	var ad models.Ad
 	err := r.db.Preload("User").Preload("Subcategory").Preload("Images").
 		First(&ad, id).Error
 	return &ad, err
 }
 
-func (r *Repository) GetUserAds(userID uint, page, limit int) ([]models.Ad, int64, error) {
+func (r *AdRepository) GetUserAds(userID uint, page, limit int) ([]models.Ad, int64, error) {
 	var ads []models.Ad
 	var total int64
 
@@ -78,7 +48,7 @@ func (r *Repository) GetUserAds(userID uint, page, limit int) ([]models.Ad, int6
 	return ads, total, err
 }
 
-func (r *Repository) SearchAds(query string, categoryID, subcategoryID uint, page, limit int) ([]models.Ad, int64, error) {
+func (r *AdRepository) SearchAds(query string, categoryID, subcategoryID uint, page, limit int) ([]models.Ad, int64, error) {
 	var ads []models.Ad
 	var total int64
 
@@ -111,48 +81,20 @@ func (r *Repository) SearchAds(query string, categoryID, subcategoryID uint, pag
 	return ads, total, err
 }
 
-func (r *Repository) UpdateAd(ad *models.Ad) error {
+func (r *AdRepository) UpdateAd(ad *models.Ad) error {
 	return r.db.Save(ad).Error
 }
 
-func (r *Repository) DeleteAd(id uint) error {
+func (r *AdRepository) DeleteAd(id uint) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		// Delete associated images first
 		if err := tx.Where("ad_id = ?", id).Delete(&models.AdImage{}).Error; err != nil {
 			return err
 		}
-		// Then delete the ad
 		return tx.Delete(&models.Ad{}, id).Error
 	})
 }
 
-func (r *Repository) AddAdImages(images []models.AdImage) error {
-	return r.db.Create(&images).Error
-}
-
-func (r *Repository) GetAdImageCount(adID uint) (int64, error) {
-	var count int64
-	err := r.db.Model(&models.AdImage{}).Where("ad_id = ?", adID).Count(&count).Error
-	return count, err
-}
-
-func (r *Repository) DeleteAdImage(id uint) error {
-	return r.db.Delete(&models.AdImage{}, id).Error
-}
-
-func (r *Repository) GetAdImageByID(id uint) (*models.AdImage, error) {
-	var image models.AdImage
-	err := r.db.First(&image, id).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("image not found") // Лучше возвращать кастомную ошибку
-		}
-		return nil, err // Возвращаем настоящую ошибку gorm
-	}
-	return &image, nil
-}
-
-func (r *Repository) CreateAdWithImages(ad *models.Ad, imagePaths []string) error {
+func (r *AdRepository) CreateAdWithImages(ad *models.Ad, imagePaths []string) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Создаем объявление
 		if err := tx.Create(ad).Error; err != nil {
@@ -162,7 +104,7 @@ func (r *Repository) CreateAdWithImages(ad *models.Ad, imagePaths []string) erro
 		// Если есть изображения, создаем их
 		if len(imagePaths) > 0 {
 			if len(imagePaths) > 7 {
-				return errors.New("cannot add more than 7 images to an ad")
+				return gorm.ErrInvalidTransaction
 			}
 
 			images := make([]models.AdImage, len(imagePaths))

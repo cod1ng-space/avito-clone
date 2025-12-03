@@ -23,7 +23,7 @@ func Load() *Config {
 		DBUser:     getEnv("DB_USER", "postgres"),
 		DBPassword: getEnv("DB_PASSWORD", "postgre"),
 		DBName:     getEnv("DB_NAME", "db-omega"),
-		JWTSecret:  getEnv("JWT_SECRET", "uper_secret_jwt_key"),
+		JWTSecret:  getEnv("JWT_SECRET", "super_secret_jwt_key"),
 		UploadDir:  getEnv("UPLOAD_DIR", "./uploads/images"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 	}
