@@ -61,41 +61,35 @@ func (a *App) InitEcho() {
 	a.echo.Use(echomiddleware.Recover())
 	a.echo.Use(echomiddleware.CORS())
 
-	// Serve uploaded images
 	a.echo.Static("/images", a.cfg.UploadDir)
 	a.SetupValidator()
 }
 
 func (a *App) RegisterRoutes() {
-	// Initialize repositories
 	authRepo := repository.NewAuthRepository(a.db)
 	userRepo := repository.NewUserRepository(a.db)
 	categoryRepo := repository.NewCategoryRepository(a.db)
 	adRepo := repository.NewAdRepository(a.db)
 	imageRepo := repository.NewImageRepository(a.db)
 
-	// Initialize services
 	authService := service.NewAuthService(authRepo, a.cfg)
 	userService := service.NewUserService(userRepo, authRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
 	adService := service.NewAdService(adRepo)
 	imageService := service.NewImageService(imageRepo, adRepo)
 
-	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	adHandler := handlers.NewAdHandler(adService)
 	imageHandler := handlers.NewImageHandler(imageService)
 
-	// Public routes
 	a.echo.POST("/register", authHandler.Register)
 	a.echo.POST("/login", authHandler.Login)
 	a.echo.GET("/categories", categoryHandler.GetCategories)
 	a.echo.GET("/ads", adHandler.SearchAds)
 	a.echo.GET("/ads/:id", adHandler.GetAd)
 
-	// Protected routes
 	protected := a.echo.Group("")
 	protected.Use(middleware.JWTAuth(a.cfg))
 
@@ -108,7 +102,6 @@ func (a *App) RegisterRoutes() {
 	protected.PUT("/ads/:id", adHandler.UpdateAd)
 	protected.DELETE("/ads/:id", adHandler.DeleteAd)
 
-	// Image routes with upload middleware
 	protected.POST("/ads/:id/images", imageHandler.AddImages, middleware.UploadFiles)
 	protected.DELETE("/images/:imageId", imageHandler.DeleteImage)
 }
