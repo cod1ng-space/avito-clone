@@ -35,7 +35,7 @@ const LoginForm = () => {
     
     // Проверка валидности email перед отправкой
     if (!validateEmail(email)) {
-      return setError('Введите корректный адрес электронной почты');
+      return setError('Неверный формат электронной почты');
     }
     
     try {

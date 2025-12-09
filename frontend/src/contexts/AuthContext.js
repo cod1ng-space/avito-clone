@@ -47,9 +47,16 @@ export const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || error.message || 'Ошибка входа в систему' 
+      if (error.response?.data?.message === 'invalid credentials') {
+        return {
+          success: false,
+          message: 'Неверная почта или пароль'
+        };
+      }
+      
+      return {
+        success: false,
+        message: error.message || 'Ошибка входа в систему'
       };
     }
   };

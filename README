@@ -143,3 +143,4 @@ make start  # Запуск через docker-compose
 ```
 
 # fix volumes docker compose down -v
+# docker stop $(docker ps -q)
