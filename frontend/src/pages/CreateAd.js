@@ -32,7 +32,7 @@ const CreateAd = () => {
       
       let newAd;
       
-      // Используем новый API если есть изображения, иначе старый
+      // Используем API с картинками если есть изображения, иначе обычный
       if (images && images.length > 0) {
         newAd = await adsService.createWithImages(adData, images);
       } else {

@@ -8,8 +8,8 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [subcategoryId, setSubcategoryId] = useState('');
-  const [newImages, setNewImages] = useState([]); // Новые файлы для загрузки
-  const [existingImages, setExistingImages] = useState([]); // Существующие изображения
+  const [newImages, setNewImages] = useState([]);
+  const [existingImages, setExistingImages] = useState([]); 
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState({});
@@ -18,7 +18,6 @@ const AdForm = ({ categories, onSubmit, loading, initialData, adId }) => {
     if (initialData) {
       setTitle(initialData.title);
       setDescription(initialData.description);
-      // Ensure we store subcategory id as a string so it matches option values
       setSubcategoryId(initialData.subcategory_id ? String(initialData.subcategory_id) : '');
       setExistingImages(initialData.images || []);
     }
